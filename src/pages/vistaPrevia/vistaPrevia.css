@@ -1,0 +1,87 @@
+/* Estilo general */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+}
+
+/* Envoltorio que ocupa toda la altura y fuerza al footer al fondo */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Contenido principal */
+.container {
+    flex: 1;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+/* Títulos */
+h2 {
+    font-size: 35px;
+}
+
+h3 {
+    margin-top: -25px;
+    font-size: 20px;
+    font-weight: lighter;
+}
+
+/* Botones sociales */
+.social-buttons {
+    margin-top: 40px;
+}
+
+.boton {
+    position: relative;
+    display: flex;
+    border-radius: 30px;
+    margin: 20px auto;
+    width: 80%;
+    font-size: 25px;
+    align-items: center;
+    justify-content: center;
+    height: 65px;
+    cursor: pointer;
+}
+
+.boton span {
+}
+
+.boton i {
+    position: absolute;
+    left: 25px;
+    font-size: 30px;
+}
+
+/* Botón guardar contacto */
+button {
+    color: white;
+    padding: 10px 20px;
+    font-size: 25px;
+    cursor: pointer;
+    border: none;
+    border-radius: 30px;
+    margin-top: 20px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 15px;
+    font-weight: bold;
+}
+
+footer a {
+    color: inherit;
+    font-weight: bold;
+    text-decoration: none;
+}
