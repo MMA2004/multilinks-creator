@@ -1,5 +1,5 @@
 // src/pages/VistaPrevia.jsx
-import './VistaPrevia.css';
+import './vistaPrevia.css';
 
 function VistaPrevia({ data }) {
     const {
