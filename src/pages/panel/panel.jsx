@@ -14,15 +14,16 @@ function Panel() {
         <div style={{ padding: "2rem" }}>
             <h2>Bienvenido, {usuario.email}</h2>
 
-            {isAdmin && (
+            {isAdmin ? (
                 <>
                     <button onClick={() => navigate("/crear-multilink")}>Crear multilink</button>
-                    <button onClick={() => navigate("/acceder")}>Editar multilink</button>
+                    <button onClick={() => navigate("/acceder")}>Editar multilink (con clave)</button>
                 </>
-            )}
-
-            {!isAdmin && (
-                <button onClick={() => navigate("/acceder")}>Editar multilink</button>
+            ) : (
+                <>
+                    <button onClick={() => navigate("/registrar-multilink")}>Registrar Multilink</button>
+                    <button onClick={() => navigate("/mis-multilinks")}>Ver mis Multilinks</button>
+                </>
             )}
         </div>
     );

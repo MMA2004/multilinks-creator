@@ -7,6 +7,7 @@ function VistaPrevia({ data }) {
         imagen = '',
         tamano_foto = '',
         titulo = '',
+        borde = '',
         color_titulo = '#000000',
         tamano_titulo = '24px',
         mt_titulo = '10px',
@@ -20,7 +21,9 @@ function VistaPrevia({ data }) {
         botones = [],
         mostrar_boton_contacto = false,
         contacto_bg = '#3aabd4',
-        contacto_color = 'white'
+        contacto_color = 'white',
+        contacto_borde_grosor = '0',
+        contacto_borde_color = '#000000',
     } = data;
 
     return (
@@ -29,7 +32,7 @@ function VistaPrevia({ data }) {
             style={{ background: fondo }}
         >
             <div className="container">
-                {imagen && <img src={imagen} alt="Foto de perfil" className="profile-pic" style={{ width: tamano_foto }} />}
+                {imagen && <img src={imagen} alt="Foto de perfil" className="profile-pic" style={{ width: tamano_foto, borderRadius: borde }} />}
                 <h2
                     style={{
                         color: color_titulo,
@@ -59,12 +62,13 @@ function VistaPrevia({ data }) {
                             onClick={() => window.open(boton.url, '_blank')}
                             style={{
                                 backgroundColor: boton.bg_color || 'white',
-                                color: boton.text_color || '#3aabd4'
+                                color: boton.text_color,
+                                border: `${boton.borde_grosor}px solid ${boton.borde_color}`
                             }}
                         >
                             <i
-                                className={`bi ${boton.icono || 'bi-link-45deg'}`}
-                                style={{ color: boton.icon_color || '#3aabd4' }}
+                                className={`bi ${boton.icono}`}
+                                style={{ color: boton.icon_color}}
                             ></i>
                             <span>{boton.texto}</span>
                         </div>
@@ -73,7 +77,7 @@ function VistaPrevia({ data }) {
 
                 {mostrar_boton_contacto && (
                     <a href="#" download>
-                        <button style={{ backgroundColor: contacto_bg, color: contacto_color }}>
+                        <button className="guardar" style={{ backgroundColor: contacto_bg, color: contacto_color, border: `${contacto_borde_grosor}px solid ${contacto_borde_color}` }}>
                             Guardar Contacto
                         </button>
                     </a>

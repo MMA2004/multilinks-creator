@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
 import Formulario from "./pages/formulario.jsx";
 import AccederMultilink from "./pages/AccederMultilink/AccederMultilink.jsx";
 import CrearMultilink from "./pages/crearMultiliks/crearMultilinks.jsx";
@@ -7,6 +6,11 @@ import Login from "./pages/login/login.jsx";
 import Panel from "./pages/panel/panel.jsx";
 import Registro from "./pages/registro/registro.jsx";
 import Inicio from "./pages/Inicio/inicio.jsx";
+import RegistrarMultilink from "./pages/registrarMultilink/registrarMultilink.jsx";
+import MisMultilinks from "./pages/misMultilinks/MisMultilinks.jsx";
+import Estadisticas from "./pages/estadisticas/Estadisticas.jsx";
+import FormularioCliente from "./pages/formularioClientes/formularioClientes.jsx";
+import ResFormulario from "./pages/ResFormulario/ResFormulario.jsx";
 
 function App() {
     return (
@@ -19,6 +23,11 @@ function App() {
                 <Route path="/editar/:id" element={<Formulario />} />
                 <Route path="/acceder" element={<AccederMultilink />} />
                 <Route path="/crear-multilink" element={<CrearMultilink />} />
+                <Route path="/registrar-multilink" element={<RegistrarMultilink />} />
+                <Route path="/mis-multilinks" element={<MisMultilinks />} />
+                <Route path="/estadisticas/:url" element={<Estadisticas />} />
+                <Route path="/formulario/:id" element={<FormularioCliente />} />
+                <Route path="/respuestas/:url" element={<ResFormulario />} />
             </Routes>
         </Router>
     );

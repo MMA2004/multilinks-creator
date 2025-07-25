@@ -11,6 +11,7 @@ function CrearMultilink() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const navigate = useNavigate();
+    const [formularioActivado, setFormularioActivado] = useState(false);
 
     const esAdmin = useAdmin(); // Asume que esto valida si el usuario es administrador
 
@@ -36,6 +37,7 @@ function CrearMultilink() {
 
             // Plantilla por defecto
             const plantilla = {
+                titulo_pagina: "Ejemplo",
                 plantilla: "plantilla_comercial",
                 titulo: "Título",
                 subtitulo: "Subtítulo",
@@ -58,11 +60,13 @@ function CrearMultilink() {
                 contacto_color: "#ffffff",
                 nombre: "",
                 nota: "",
+                formulario_activado: false,
+                formulario_campos: [],
                 botones: [
                     {
                         url: "",
                         texto: "Boton",
-                        icono: "bi-link",
+                        icono: "",
                         bg_color: "#000000",
                         text_color: "#ffffff",
                         icon_color: "#ffffff",
@@ -75,6 +79,7 @@ function CrearMultilink() {
                 ...plantilla,
                 url: url.trim().toLowerCase(),
                 clave_edicion: clave,
+                formulario_activado: formularioActivado,
                 creado_en: new Date(),
             });
 
@@ -108,6 +113,14 @@ function CrearMultilink() {
                     value={clave}
                     onChange={(e) => setClave(e.target.value)}
                 /><br />
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={formularioActivado}
+                        onChange={(e) => setFormularioActivado(e.target.checked)}
+                    />
+                    Activar formulario personalizado
+                </label><br />
 
                 <button type="submit">Crear Multilink</button>
                 {error && <p style={{ color: "red" }}>{error}</p>}
