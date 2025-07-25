@@ -61,7 +61,7 @@ function Formulario() {
                         const nuevosBotones = [...(data.botones || [])];
                         if (data.formulario_activado && !yaTieneFormulario) {
                             nuevosBotones.push({
-                                url: `http://localhost:5173/formulario/${id}`,
+                                url: `https://multilinks-creator.gibracompany.com/formulario/${id}`,
                                 texto: "Formulario",
                                 icono: "bi-ui-checks",
                                 bg_color: "#000000",
