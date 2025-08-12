@@ -11,6 +11,7 @@ import MisMultilinks from "./pages/misMultilinks/MisMultilinks.jsx";
 import Estadisticas from "./pages/estadisticas/Estadisticas.jsx";
 import FormularioCliente from "./pages/formularioClientes/formularioClientes.jsx";
 import ResFormulario from "./pages/ResFormulario/ResFormulario.jsx";
+import AdminTools from "./pages/tools/tools.jsx";
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
                 <Route path="/estadisticas/:url" element={<Estadisticas />} />
                 <Route path="/formulario/:id" element={<FormularioCliente />} />
                 <Route path="/respuestas/:url" element={<ResFormulario />} />
+                <Route path="/admin-tools" element={<AdminTools />} />
             </Routes>
         </Router>
     );
