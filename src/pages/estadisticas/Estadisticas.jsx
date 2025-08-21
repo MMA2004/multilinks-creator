@@ -117,7 +117,7 @@ export default function Estadisticas() {
                                 <div className="list">
                                     {(stats.ultimas_visitas?.length ? stats.ultimas_visitas : []).map((v, i) => (
                                         <div className="row" key={i}>
-                                            <strong>{new Date(v.timestamp).toLocaleString()}</strong>
+                                            <strong>{new Date(v.fecha).toLocaleString()}</strong>
                                             <div className="muted">Referrer: <em>{v.referrer || "Directo"}</em></div>
                                         </div>
                                     ))}
@@ -130,7 +130,7 @@ export default function Estadisticas() {
                                 <div className="list">
                                     {(stats.ultimos_clicks?.length ? stats.ultimos_clicks : []).map((c, i) => (
                                         <div className="row" key={i}>
-                                            <strong>{new Date(c.timestamp).toLocaleString()}</strong>
+                                            <strong>{new Date(c.fecha).toLocaleString()}</strong>
                                             <div className="muted">Botón: <em>{c.boton}</em></div>
                                         </div>
                                     ))}
