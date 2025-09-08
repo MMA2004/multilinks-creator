@@ -2,7 +2,7 @@ import { useState } from "react";
 import { db } from "../../services/firebase";
 import { collection, query, where, getDocs, updateDoc, doc, arrayUnion } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function RegistrarMultilink() {
     const [url, setUrl] = useState("");
