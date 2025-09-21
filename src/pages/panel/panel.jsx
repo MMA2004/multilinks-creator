@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useAdmin } from "../../hooks/useAdmin.js";
-import styles from "./Panel.module.css";
+import styles from "./panel.module.css";
 
 export default function Panel() {
     const { usuario } = useAuth();
