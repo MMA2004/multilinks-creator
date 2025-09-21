@@ -1,0 +1,165 @@
+.panelRoot {
+    min-height: 100vh;
+    width: 100vw;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(120deg, #0ea5e9, #8b5cf6, #14b8a6);
+    background-size: 180% 180%;
+    animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0 50% }
+}
+
+.card {
+    width: 100%;
+    max-width: 900px;
+    color: #fff;
+    padding: 28px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.hello {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, .15);
+    border: 1px solid rgba(255, 255, 255, .25);
+    font-weight: 800;
+}
+
+.title {
+    font-size: clamp(22px, 4vw, 28px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0;
+}
+
+.role {
+    opacity: .9;
+    font-size: 13px;
+}
+
+.grid {
+    display: grid;
+    gap: 16px;
+    margin-top: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.action {
+    position: relative;
+    padding: 16px;
+    border-radius: 16px;
+    text-align: left;
+    cursor: pointer;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .20);
+    transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+}
+
+.action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0,0,0,.28);
+}
+
+.icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.actTitle {
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.actDesc {
+    opacity: .9;
+    font-size: 14px;
+}
+
+/* Botón “glass” reutilizable (para el nuevo botón) */
+.btnGlass {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, .30);
+    background: rgba(255, 255, 255, .18);
+    color: #fff;
+    font-weight: 700;
+    padding: 12px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.btnGlass:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    background: rgba(255, 255, 255, .22);
+}
+
+.btnRow {
+    margin-top: 6px;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* footer */
+.footer {
+    margin-top: 22px;
+    opacity: .9;
+    font-size: 12px;
+}
+
+.footerLink {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Accesibilidad */
+.action:focus-visible,
+.btnGlass:focus-visible {
+    outline: 3px solid rgba(255,255,255,.9);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(14,165,233,.45);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .panelRoot { animation: none; }
+    .action, .btnGlass { transition: none; }
+}
