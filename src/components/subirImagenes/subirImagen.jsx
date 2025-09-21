@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { storage } from "../../services/firebase.js";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import styles from "./SubirImagen.module.css";
+import styles from "./subirImagen.module.css";
 
 /**
  * SubirImagen
