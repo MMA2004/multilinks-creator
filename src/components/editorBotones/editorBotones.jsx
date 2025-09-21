@@ -1,5 +1,7 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
+import styles from "./editorBotones.module.css";
+import IconPicker from "./IconPicker";
 
 function EditorBotones({ botones, setBotones }) {
     const [nuevoBoton, setNuevoBoton] = useState({
@@ -19,22 +21,15 @@ function EditorBotones({ botones, setBotones }) {
         const icon_color = localStorage.getItem("ultimo_icon_color") || "#3aabd4";
         const borde_color = localStorage.getItem("ultimo_borde_color") || "#000000";
         const borde_grosor = localStorage.getItem("ultimo_borde_grosor") || "0";
-
         setNuevoBoton((prev) => ({
-            ...prev,
-            bg_color,
-            text_color,
-            icon_color,
-            borde_color,
-            borde_grosor,
+            ...prev, bg_color, text_color, icon_color, borde_color, borde_grosor,
         }));
     }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNuevoBoton({ ...nuevoBoton, [name]: value });
-
-        if (["bg_color", "text_color", "icon_color", "borde_color", "borde_grosor"].includes(name)) {
+        if (["bg_color","text_color","icon_color","borde_color","borde_grosor"].includes(name)) {
             localStorage.setItem(`ultimo_${name}`, value);
         }
     };
@@ -54,7 +49,6 @@ function EditorBotones({ botones, setBotones }) {
     const agregarBoton = () => {
         const nuevos = [...botones];
         const indexResFormulario = nuevos.findIndex((boton) => boton.tipo === "ResFormulario");
-
         const nuevo = {
             ...nuevoBoton,
             bg_color: localStorage.getItem("ultimo_bg_color") || nuevoBoton.bg_color,
@@ -63,24 +57,19 @@ function EditorBotones({ botones, setBotones }) {
             borde_color: localStorage.getItem("ultimo_borde_color") || nuevoBoton.borde_color,
             borde_grosor: localStorage.getItem("ultimo_borde_grosor") || nuevoBoton.borde_grosor,
         };
-
-        if (indexResFormulario !== -1) {
-            nuevos.splice(indexResFormulario, 0, nuevo);
-        } else {
-            nuevos.push(nuevo);
-        }
+        if (indexResFormulario !== -1) nuevos.splice(indexResFormulario, 0, nuevo);
+        else nuevos.push(nuevo);
 
         setBotones(nuevos);
-        setNuevoBoton({
-            url: "",
-            texto: "",
-            icono: "",
+        setNuevoBoton((prev) => ({
+            ...prev,
+            url: "", texto: "", icono: "",
             bg_color: localStorage.getItem("ultimo_bg_color") || "#ffffff",
             text_color: localStorage.getItem("ultimo_text_color") || "#3aabd4",
             icon_color: localStorage.getItem("ultimo_icon_color") || "#3aabd4",
             borde_color: localStorage.getItem("ultimo_borde_color") || "#000000",
             borde_grosor: localStorage.getItem("ultimo_borde_grosor") || "0",
-        });
+        }));
     };
 
     const moverBotonArriba = (index) => {
@@ -97,97 +86,94 @@ function EditorBotones({ botones, setBotones }) {
         setBotones(nuevos);
     };
 
-    const iconosDisponibles = [
-        { nombre: 'WhatsApp', clase: 'bi-whatsapp' },
-        { nombre: 'Instagram', clase: 'bi-instagram' },
-        { nombre: 'Facebook', clase: 'bi-facebook' },
-        { nombre: 'Tiktok', clase: 'bi-tiktok' },
-        { nombre: 'Lista', clase: 'bi-list' },
-        { nombre: 'Teléfono', clase: 'bi-telephone' },
-        { nombre: 'Correo', clase: 'bi-envelope' },
-        { nombre: 'Globo web', clase: 'bi-globe' },
-        { nombre: 'Ubicación', clase: 'bi-geo-alt-fill' },
-        { nombre: 'Enlace', clase: 'bi-link-45deg' },
-        { nombre: 'Spotify', clase: 'bi-spotify' },
-        { nombre: 'Youtube', clase: 'bi-youtube' },
-        { nombre: 'LinkedIn', clase: 'bi-linkedin' },
-        { nombre: 'Formulario', clase: 'bi bi-ui-checks' },
-    ];
-
     return (
-        <div className="ebx-root">
-            <style>{styles}</style>
+        <div className={styles.root}>
+            <h3 className={styles.title}>Botones</h3>
 
-            <h3 className="ebx-title">Botones</h3>
-
-            <Accordion defaultActiveKey="0" alwaysOpen className="ebx-acc">
+            <Accordion defaultActiveKey="0" alwaysOpen className={styles.acc}>
                 {botones.map((b, i) => (
-                    <Accordion.Item eventKey={i.toString()} key={i} className="ebx-item">
+                    <Accordion.Item eventKey={i.toString()} key={i} className={styles.item}>
                         <Accordion.Header>
-                            <div className="ebx-itemhead">
-                                <span className="ebx-badge">#{i + 1}</span>
-                                <span className="ebx-itemtitle">{b.texto || "Sin texto"}</span>
+                            <div className={styles.itemhead}>
+                                <span className={styles.badge}>#{i + 1}</span>
+                                <span className={styles.itemtitle}>{b.texto || "Sin texto"}</span>
                             </div>
                         </Accordion.Header>
-                        <Accordion.Body className="ebx-body">
+
+                        <Accordion.Body className={styles.body}>
                             <div className="mb-3">
-                                <label className="ebx-label">Texto</label>
-                                <input className="ebx-input" value={b.texto} onChange={(e) => handleBotonEdit(i, "texto", e.target.value)} />
+                                <label className={styles.label}>Texto</label>
+                                <input
+                                    className={styles.input}
+                                    value={b.texto}
+                                    onChange={(e) => handleBotonEdit(i, "texto", e.target.value)}
+                                />
                             </div>
 
                             <div className="mb-3">
-                                <label className="ebx-label">URL</label>
-                                <input className="ebx-input" value={b.url} onChange={(e) => handleBotonEdit(i, "url", e.target.value)} readOnly={b.tipo === "ResFormulario"} />
+                                <label className={styles.label}>URL</label>
+                                <input
+                                    className={styles.input}
+                                    value={b.url}
+                                    onChange={(e) => handleBotonEdit(i, "url", e.target.value)}
+                                    readOnly={b.tipo === "ResFormulario"}
+                                />
                             </div>
 
-                            <div className="mb-2">
-                                <label className="ebx-label">Icono</label>
-                                <select className="ebx-input" value={b.icono} onChange={(e) => handleBotonEdit(i, "icono", e.target.value)}>
-                                    <option value="">-- Selecciona un icono --</option>
-                                    {iconosDisponibles.map((icono) => (
-                                        <option key={icono.clase} value={icono.clase}>
-                                            {icono.nombre}
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className="mb-3">
+                                <label className={styles.label}>Icono</label>
+                                <IconPicker
+                                    value={b.icono}
+                                    onChange={(val) => handleBotonEdit(i, "icono", val)}
+                                />
                             </div>
 
                             <div className="row g-2">
                                 <div className="col">
-                                    <label className="ebx-label">Color del fondo</label>
-                                    <input type="color" className="ebx-color" value={b.bg_color} onChange={(e) => handleBotonEdit(i, "bg_color", e.target.value)} />
+                                    <label className={styles.label}>Color del fondo</label>
+                                    <input type="color" className={styles.color}
+                                           value={b.bg_color}
+                                           onChange={(e) => handleBotonEdit(i, "bg_color", e.target.value)} />
                                 </div>
                                 <div className="col">
-                                    <label className="ebx-label">Color del texto</label>
-                                    <input type="color" className="ebx-color" value={b.text_color} onChange={(e) => handleBotonEdit(i, "text_color", e.target.value)} />
+                                    <label className={styles.label}>Color del texto</label>
+                                    <input type="color" className={styles.color}
+                                           value={b.text_color}
+                                           onChange={(e) => handleBotonEdit(i, "text_color", e.target.value)} />
                                 </div>
                                 <div className="col">
-                                    <label className="ebx-label">Color del ícono</label>
-                                    <input type="color" className="ebx-color" value={b.icon_color} onChange={(e) => handleBotonEdit(i, "icon_color", e.target.value)} />
+                                    <label className={styles.label}>Color del ícono</label>
+                                    <input type="color" className={styles.color}
+                                           value={b.icon_color}
+                                           onChange={(e) => handleBotonEdit(i, "icon_color", e.target.value)} />
                                 </div>
                             </div>
 
                             <div className="row g-2 mt-2">
                                 <div className="col">
-                                    <label className="ebx-label">Color del borde</label>
-                                    <input type="color" className="ebx-color" value={b.borde_color} onChange={(e) => handleBotonEdit(i, "borde_color", e.target.value)} />
+                                    <label className={styles.label}>Color del borde</label>
+                                    <input type="color" className={styles.color}
+                                           value={b.borde_color}
+                                           onChange={(e) => handleBotonEdit(i, "borde_color", e.target.value)} />
                                 </div>
                                 <div className="col">
-                                    <label className="ebx-label">Grosor del borde (px)</label>
-                                    <input className="ebx-input" type="number" min="0" max="15" value={b.borde_grosor} onChange={(e) => handleBotonEdit(i, "borde_grosor", e.target.value)} />
+                                    <label className={styles.label}>Grosor del borde (px)</label>
+                                    <input className={styles.input} type="number" min="0" max="15"
+                                           value={b.borde_grosor}
+                                           onChange={(e) => handleBotonEdit(i, "borde_grosor", e.target.value)} />
                                 </div>
                             </div>
 
                             <div className="d-flex flex-wrap gap-2 mt-3">
                                 {!b.fijo && (
-                                    <button className="ebx-btn ebx-danger" onClick={() => eliminarBoton(i)}>
+                                    <button className={`${styles.btn} ${styles.danger}`} onClick={() => eliminarBoton(i)}>
                                         <i className="bi bi-x-circle" /> Eliminar
                                     </button>
                                 )}
-                                <button className="ebx-btn ebx-outline" onClick={() => moverBotonArriba(i)} disabled={i === 0}>
+                                <button className={`${styles.btn} ${styles.outline}`} onClick={() => moverBotonArriba(i)} disabled={i===0}>
                                     <i className="bi bi-arrow-up" /> Subir
                                 </button>
-                                <button className="ebx-btn ebx-outline" onClick={() => moverBotonAbajo(i)} disabled={i === botones.length - 1}>
+                                <button className={`${styles.btn} ${styles.outline}`} onClick={() => moverBotonAbajo(i)} disabled={i===botones.length-1}>
                                     <i className="bi bi-arrow-down" /> Bajar
                                 </button>
                             </div>
@@ -196,82 +182,62 @@ function EditorBotones({ botones, setBotones }) {
                 ))}
             </Accordion>
 
-            <hr className="ebx-hr" />
-            <h3 className="ebx-title">Agregar nuevo botón</h3>
+            <hr className={styles.hr} />
+            <h3 className={styles.title}>Agregar nuevo botón</h3>
 
             <div className="mb-2">
-                <input name="texto" placeholder="Texto" className="ebx-input" value={nuevoBoton.texto} onChange={handleInputChange} />
+                <input name="texto" placeholder="Texto" className={styles.input}
+                       value={nuevoBoton.texto} onChange={handleInputChange} />
             </div>
             <div className="mb-2">
-                <input name="url" placeholder="URL" className="ebx-input" value={nuevoBoton.url} onChange={handleInputChange} />
+                <input name="url" placeholder="URL" className={styles.input}
+                       value={nuevoBoton.url} onChange={handleInputChange} />
             </div>
-            <div className="mb-2">
-                <label className="ebx-label">Icono</label>
-                <select name="icono" className="ebx-input" value={nuevoBoton.icono} onChange={handleInputChange}>
-                    <option value="">-- Selecciona un icono --</option>
-                    {iconosDisponibles.map((icono) => (
-                        <option key={icono.clase} value={icono.clase}>
-                            {icono.nombre}
-                        </option>
-                    ))}
-                </select>
+
+            <div className="mb-3">
+                <label className={styles.label}>Icono</label>
+                <IconPicker
+                    value={nuevoBoton.icono}
+                    onChange={(val) => setNuevoBoton((p) => ({ ...p, icono: val }))}
+                />
             </div>
 
             <div className="row g-2 mt-2">
                 <div className="col">
-                    <label className="ebx-label">Color del fondo</label>
-                    <input type="color" name="bg_color" className="ebx-color" value={nuevoBoton.bg_color} onChange={handleInputChange} />
+                    <label className={styles.label}>Color del fondo</label>
+                    <input type="color" name="bg_color" className={styles.color}
+                           value={nuevoBoton.bg_color} onChange={handleInputChange} />
                 </div>
                 <div className="col">
-                    <label className="ebx-label">Color del texto</label>
-                    <input type="color" name="text_color" className="ebx-color" value={nuevoBoton.text_color} onChange={handleInputChange} />
+                    <label className={styles.label}>Color del texto</label>
+                    <input type="color" name="text_color" className={styles.color}
+                           value={nuevoBoton.text_color} onChange={handleInputChange} />
                 </div>
                 <div className="col">
-                    <label className="ebx-label">Color del ícono</label>
-                    <input type="color" name="icon_color" className="ebx-color" value={nuevoBoton.icon_color} onChange={handleInputChange} />
+                    <label className={styles.label}>Color del ícono</label>
+                    <input type="color" name="icon_color" className={styles.color}
+                           value={nuevoBoton.icon_color} onChange={handleInputChange} />
                 </div>
             </div>
 
             <div className="row g-2 mt-2">
                 <div className="col">
-                    <label className="ebx-label">Color del borde</label>
-                    <input type="color" name="borde_color" className="ebx-color" value={nuevoBoton.borde_color} onChange={handleInputChange} />
+                    <label className={styles.label}>Color del borde</label>
+                    <input type="color" name="borde_color" className={styles.color}
+                           value={nuevoBoton.borde_color} onChange={handleInputChange} />
                 </div>
                 <div className="col">
-                    <label className="ebx-label">Grosor del borde (px)</label>
-                    <input className="ebx-input" type="number" name="borde_grosor" min="0" max="15" value={nuevoBoton.borde_grosor} onChange={handleInputChange} />
+                    <label className={styles.label}>Grosor del borde (px)</label>
+                    <input className={styles.input} type="number" name="borde_grosor" min="0" max="15"
+                           value={nuevoBoton.borde_grosor} onChange={handleInputChange} />
                 </div>
             </div>
 
-            <button className="ebx-btn ebx-success mt-2" onClick={agregarBoton}>
-                <i className="bi bi-plus-circle"></i> Agregar
+            <button className={`${styles.btn} ${styles.success} mt-2`} onClick={agregarBoton}>
+                <i className="bi bi-plus-circle" /> Agregar
             </button>
         </div>
     );
 }
 
 export default EditorBotones;
-
-const styles = `
-  .ebx-root { width: 100%; max-width: 540px; color:#fff; }
-  .ebx-title { font-size: clamp(18px, 3vw, 22px); font-weight:800; margin-bottom:12px; }
-  .ebx-acc .accordion-item { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); overflow:hidden; border-radius:14px; margin-bottom:10px; }
-  .ebx-acc .accordion-button { background: rgba(0,0,0,.15); color:#fff; box-shadow:none; }
-  .ebx-itemhead { display:flex; align-items:center; gap:10px; }
-  .ebx-badge { background: rgba(255,255,255,.20); border:1px solid rgba(255,255,255,.30); padding:4px 8px; border-radius:999px; font-size:12px; }
-  .ebx-itemtitle { font-weight:700; }
-  .ebx-body { background: rgba(255,255,255,.06); }
-
-  .ebx-label { font-size:12px; opacity:.95; display:block; margin-bottom:6px; }
-  .ebx-input { width:100%; border-radius:12px; padding:10px 12px; font-size:14px; color:#0f172a; background: rgba(255,255,255,.95); border:1px solid rgba(15,23,42,.08); outline:none; transition:.15s ease; }
-  .ebx-input:focus { box-shadow: 0 0 0 4px rgba(255,255,255,.35); border-color: rgba(255,255,255,.6); }
-  .ebx-color { width:100%; height:42px; padding:0; border-radius:12px; border:1px solid rgba(15,23,42,.08); background:#fff; }
-
-  .ebx-btn { appearance:none; border:0; border-radius:12px; padding:10px 12px; font-weight:700; background:#111827; color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow: 0 10px 22px rgba(0,0,0,.25); }
-  .ebx-btn.ebx-outline { background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.30); }
-  .ebx-btn.ebx-success { background:#10b981; }
-  .ebx-btn.ebx-danger { background:#dc2626; }
-
-  .ebx-hr { border:0; height:1px; background: rgba(255,255,255,.18); margin:14px 0; }
-`;
-

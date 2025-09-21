@@ -1,0 +1,47 @@
+.root { color: #fff; }
+
+.row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* File input bonito */
+.file { position: relative; display: inline-block; }
+.file input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.fileLabel {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 12px;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.30);
+    font-weight: 700; color: #fff;
+}
+
+/* Botones */
+.btn {
+    appearance: none; border: 0; border-radius: 12px;
+    padding: 10px 16px; font-weight: 700;
+    background: #111827; color: #fff; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 10px 22px rgba(0,0,0,.25);
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(0,0,0,.3);
+}
+.btn:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+.danger { background: #dc2626; }
+
+/* Preview */
+.preview { margin-top: 12px; text-align: center; }
+.imgwrap {
+    display: inline-block; padding: 8px; border-radius: 16px;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.20);
+    backdrop-filter: blur(6px);
+}
+.imgwrap img { max-width: 200px; border-radius: 12px; display: block; }

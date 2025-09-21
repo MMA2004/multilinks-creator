@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { db } from "../../services/firebase";
-import { collection, query, where, getDocs, updateDoc, doc, arrayUnion } from "firebase/firestore";
+import {
+    collection, query, where, getDocs, updateDoc, doc, arrayUnion
+} from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import styles from "./RegistrarMultilink.module.css";
 
 export default function RegistrarMultilink() {
     const [url, setUrl] = useState("");
@@ -14,24 +17,22 @@ export default function RegistrarMultilink() {
     const { usuario } = useAuth();
     const navigate = useNavigate();
 
-    // ---- Nuevo: estados para CSV ----
+    // ---- CSV state ----
     const [csvFile, setCsvFile] = useState(null);
-    const [bulkResults, setBulkResults] = useState([]); // [{url, status: 'ok'|'err', message}]
+    const [bulkResults, setBulkResults] = useState([]); // [{url, status, message}]
     const [bulkRunning, setBulkRunning] = useState(false);
     const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0 });
 
     const registerOne = async (urlTrim, claveTrim) => {
         // Retorna {ok: boolean, message: string}
-        const q = query(
+        const qy = query(
             collection(db, "multilinks"),
             where("url", "==", urlTrim),
             where("clave_edicion", "==", claveTrim)
         );
-        const snap = await getDocs(q);
+        const snap = await getDocs(qy);
 
-        if (snap.empty) {
-            return { ok: false, message: "URL o clave incorrecta." };
-        }
+        if (snap.empty) return { ok: false, message: "URL o clave incorrecta." };
 
         const docSnap = snap.docs[0];
         const data = docSnap.data();
@@ -85,10 +86,9 @@ export default function RegistrarMultilink() {
         }
     };
 
-    // ---- Nuevo: helpers para CSV ----
+    // ---- CSV helpers ----
     const parseCSV = async (file) => {
         const text = await file.text();
-        // Detectar separador (, o ;)
         const firstLine = text.split(/\r?\n/).find((l) => l.trim().length > 0) || "";
         const commaCount = (firstLine.match(/,/g) || []).length;
         const semiCount = (firstLine.match(/;/g) || []).length;
@@ -114,7 +114,7 @@ export default function RegistrarMultilink() {
             const cols = lines[i].split(sep).map((c) => c.trim());
             const urlVal = (cols[urlIdx] || "").trim();
             const claveVal = (cols[claveIdx] || "").trim();
-            if (!urlVal) continue; // saltar filas vacías
+            if (!urlVal) continue;
             rows.push({ url: urlVal, clave: claveVal });
         }
         return rows;
@@ -147,7 +147,6 @@ export default function RegistrarMultilink() {
             setBulkProgress({ done: 0, total: rows.length });
 
             const results = [];
-            // Procesar en serie para controlar carga y respetar reglas de seguridad/consumo
             for (let i = 0; i < rows.length; i++) {
                 const { url, clave } = rows[i];
                 const urlTrim = (url || "").trim();
@@ -155,11 +154,7 @@ export default function RegistrarMultilink() {
 
                 try {
                     const res = await registerOne(urlTrim, claveTrim);
-                    results.push({
-                        url: urlTrim,
-                        status: res.ok ? "ok" : "err",
-                        message: res.message,
-                    });
+                    results.push({ url: urlTrim, status: res.ok ? "ok" : "err", message: res.message });
                 } catch (err) {
                     console.error(err);
                     results.push({ url: urlTrim, status: "err", message: "Error inesperado." });
@@ -187,7 +182,7 @@ export default function RegistrarMultilink() {
         }
     };
 
-    // --- UI estado para drag & drop ---
+    // --- Drag & drop UI state ---
     const [isDragOver, setIsDragOver] = useState(false);
 
     const onDropzoneClick = () => {
@@ -205,7 +200,6 @@ export default function RegistrarMultilink() {
         e.preventDefault();
         setIsDragOver(true);
     };
-
     const onDragLeave = () => setIsDragOver(false);
 
     const onDrop = (e) => {
@@ -217,119 +211,46 @@ export default function RegistrarMultilink() {
 
     const clearCsv = () => setCsvFile(null);
 
+    // progreso %
+    const progressPct =
+        bulkProgress.total ? Math.round((bulkProgress.done / bulkProgress.total) * 100) : 0;
+
     return (
-        <div className="regml-root">
-            <style>{`
-        .regml-root { 
-          min-height: 100vh; width: 100vw; display: grid; place-items: center; padding: 24px; 
-          background: linear-gradient(120deg, #0ea5e9, #8b5cf6, #14b8a6); 
-          background-size: 180% 180%; animation: gradientMove 12s ease infinite; box-sizing: border-box; 
-        }
-        @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-        .card { width: 100%; max-width: 960px; padding: 28px; border-radius: 22px; color: #fff; 
-          background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-          box-shadow: 0 18px 50px rgba(0,0,0,.25); 
-        }
-        .title { font-size: clamp(22px, 4vw, 30px); font-weight: 800; margin-bottom: 6px; }
-        .subtitle { opacity: .95; margin-bottom: 18px; }
-
-        form { display: grid; gap: 14px; }
-        .row { display: grid; gap: 14px; grid-template-columns: 1fr; }
-        @media (min-width: 640px) { .row{ grid-template-columns: 1.2fr 0.8fr; } }
-
-        .field { display: grid; gap: 8px; }
-        .label { font-size: 12px; opacity: .9; }
-        .input { width: 100%; border-radius: 12px; padding: 12px 14px; font-size: 14px; color: #0f172a; background: rgba(255,255,255,.95); border: 1px solid rgba(15, 23, 42, .08); outline: none; transition: box-shadow .15s ease, border-color .15s ease; }
-        .input:focus { box-shadow: 0 0 0 4px rgba(255,255,255,.35); border-color: rgba(255,255,255,.6); }
-
-        .input-wrap { position: relative; }
-        .toggle-pwd { position: absolute; right: 10px; top: 0; bottom: 0; margin: auto 0; height: 100%; display:flex; align-items:center; background:transparent; border:0; cursor:pointer; font-weight:700; color:#0f172a; opacity:.7; }
-
-        .hint { font-size: 12px; opacity: .9; }
-        .pill { padding:6px 10px; border-radius: 999px; background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22); font-size: 12px; }
-        .divider { height:1px; background: rgba(255,255,255,.2); margin: 6px 0 12px; }
-
-        .btn { appearance:none; border:0; border-radius:12px; padding:12px 16px; font-weight:700; background:#111827; color:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; box-shadow: 0 10px 22px rgba(0,0,0,.25); }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,0,0,.3); }
-        .btn[disabled] { opacity:.6; cursor:not-allowed; box-shadow:none; transform:none; }
-        .btn.link { background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.30); }
-
-        .alert { border-radius: 12px; padding: 10px 12px; font-size: 14px; }
-        .alert-error { background: rgba(239,68,68,.18); border: 1px solid rgba(239,68,68,.55); color:#fee2e2; }
-        .alert-success { background: rgba(34,197,94,.18); border: 1px solid rgba(34,197,94,.55); color:#dcfce7; }
-        .footer { margin-top: 16px; opacity: .9; font-size: 12px; }
-
-        .results { width:100%; overflow-x:auto; border:1px solid rgba(255,255,255,.25); border-radius:12px; }
-        table { width:100%; border-collapse: collapse; font-size: 14px; background: rgba(255,255,255,.08); }
-        th, td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,.15); text-align:left; }
-        th { background: rgba(255,255,255,.12); font-weight:700; }
-        .ok { color: #bbf7d0; }
-        .err { color: #fecaca; }
-        .upload-wrap { display:grid; gap:12px; }
-.dropzone {
-  position: relative; border: 1.5px dashed rgba(255,255,255,.5);
-  background: rgba(255,255,255,.10); border-radius: 16px;
-  padding: 22px; display:flex; align-items:center; justify-content:center; 
-  text-align:center; cursor:pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-}
-.dropzone:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0,0,0,.25); }
-.dropzone:focus-visible { outline: 0; box-shadow: 0 0 0 3px rgba(255,255,255,.45); }
-.dropzone.dragover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.85); }
-.dropzone-inner { display:grid; gap:8px; }
-.dropzone .title-sm { font-weight:800; letter-spacing:.2px; }
-.dropzone .muted { opacity:.9; font-size:13px; }
-.badges { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
-.badge {
-  padding:4px 8px; border-radius:999px; font-size:12px;
-  background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28);
-}
-.file-chip {
-  display:flex; align-items:center; gap:10px; padding:10px 12px;
-  border-radius:12px; background: rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.28); font-size:14px;
-}
-.file-chip .actions { margin-left:auto; display:flex; gap:8px; }
-.icon-btn {
-  appearance:none; border:0; border-radius:10px; padding:8px 10px; cursor:pointer; 
-  background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.30);
-  color:#fff; transition: transform .15s ease, background .15s ease, border-color .15s ease;
-}
-.icon-btn:hover { transform: translateY(-1px); }
-.progress {
-  height:10px; width:100%; border-radius:999px;
-  background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); overflow:hidden;
-}
-.progress > span {
-  display:block; height:100%; width:0%;
-  background: linear-gradient(90deg, rgba(99,102,241,.9), rgba(56,189,248,.9), rgba(45,212,191,.9));
-  transition: width .25s ease;
-}
-.hint-sm { font-size:12px; opacity:.9; }
-      `}</style>
-
-            <div className="card">
+        <div className={styles.root}>
+            <div className={styles.card}>
                 <button
-                    className="btn link"
+                    className={`${styles.btn} ${styles.link}`}
                     onClick={() => navigate(-1)}
-                    style={{ minWidth: "fit-content", marginBottom: "12px" }}
+                    type="button"
+                    style={{ minWidth: "fit-content", marginBottom: 12 }}
                 >
                     <i className="bi bi-arrow-left" aria-hidden></i> Volver
                 </button>
-                <div className="title">Registrar Multilink</div>
-                <div className="subtitle">Asocia uno o varios multilinks existentes a tu cuenta mediante la clave de edición.</div>
 
-                {error && <div className="alert alert-error" role="alert">{error}</div>}
-                {exito && <div className="alert alert-success" role="status">{exito}</div>}
+                <div className={styles.title}>Registrar Multilink</div>
+                <div className={styles.subtitle}>
+                    Asocia uno o varios multilinks existentes a tu cuenta mediante la clave de edición.
+                </div>
+
+                {error && (
+                    <div className={`${styles.alert} ${styles.alertError}`} role="alert">
+                        {error}
+                    </div>
+                )}
+                {exito && (
+                    <div className={`${styles.alert} ${styles.alertSuccess}`} role="status">
+                        {exito}
+                    </div>
+                )}
 
                 {/* Registro individual */}
-                <form onSubmit={handleSubmit}>
-                    <div className="row">
-                        <div className="field">
-                            <label className="label" htmlFor="url">URL del multilink</label>
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    <div className={styles.row}>
+                        <div className={styles.field}>
+                            <label className={styles.label} htmlFor="url">URL del multilink</label>
                             <input
                                 id="url"
-                                className="input"
+                                className={styles.input}
                                 placeholder="ej. juanperez"
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
@@ -338,12 +259,12 @@ export default function RegistrarMultilink() {
                             />
                         </div>
 
-                        <div className="field">
-                            <label className="label" htmlFor="clave">Clave de edición</label>
-                            <div className="input-wrap">
+                        <div className={styles.field}>
+                            <label className={styles.label} htmlFor="clave">Clave de edición</label>
+                            <div className={styles.inputWrap}>
                                 <input
                                     id="clave"
-                                    className="input"
+                                    className={styles.input}
                                     type={showPwd ? "text" : "password"}
                                     placeholder="••••••••"
                                     value={clave}
@@ -351,33 +272,40 @@ export default function RegistrarMultilink() {
                                     autoComplete="off"
                                     required
                                 />
-                                <button type="button" className="toggle-pwd" onClick={() => setShowPwd(s => !s)}>
+                                <button
+                                    type="button"
+                                    className={styles.togglePwd}
+                                    onClick={() => setShowPwd((s) => !s)}
+                                    aria-label={showPwd ? "Ocultar contraseña" : "Ver contraseña"}
+                                >
                                     {showPwd ? "Ocultar" : "Ver"}
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <button className="btn" type="submit" disabled={loading}>
+                    <button className={styles.btn} type="submit" disabled={loading}>
                         <i className="bi bi-bookmark-plus" aria-hidden></i>
                         {loading ? "Registrando..." : "Registrar"}
                     </button>
-                    
                 </form>
 
-                <div className="divider" />
+                <div className={styles.divider} />
 
                 {/* Registro masivo por CSV */}
                 <div>
-                    <div className="subtitle" style={{marginBottom:8}}>Registro masivo por CSV</div>
-                    <div className="hint" style={{marginBottom:10}}>
-                        Sube un archivo con encabezados <span className="pill">url</span> y <span className="pill">clave</span>.
+                    <div className={styles.subtitle} style={{ marginBottom: 8 }}>
+                        Registro masivo por CSV
+                    </div>
+                    <div className={styles.hint} style={{ marginBottom: 10 }}>
+                        Sube un archivo con encabezados <span className={styles.pill}>url</span> y{" "}
+                        <span className={styles.pill}>clave</span>.
                     </div>
 
-                    <div className="upload-wrap">
-                        {/* Dropzone bonita */}
+                    <div className={styles.uploadWrap}>
+                        {/* Dropzone */}
                         <div
-                            className={`dropzone ${isDragOver ? "dragover" : ""}`}
+                            className={`${styles.dropzone} ${isDragOver ? styles.dragover : ""}`}
                             role="button"
                             tabIndex={0}
                             onClick={onDropzoneClick}
@@ -387,18 +315,19 @@ export default function RegistrarMultilink() {
                             onDrop={onDrop}
                             aria-label="Cargar archivo CSV, clic o arrastra aquí"
                         >
-                            <div className="dropzone-inner">
-                                <div className="title-sm">
+                            <div className={styles.dropzoneInner}>
+                                <div className={styles.titleSm}>
                                     <i className="bi bi-cloud-arrow-up" aria-hidden /> Clic o arrastra tu CSV aquí
                                 </div>
-                                <div className="muted">Tamaño recomendado &lt; 2MB</div>
-                                <div className="badges">
-                                    <span className="badge">.csv</span>
-                                    <span className="badge">Separador , o ;</span>
-                                    <span className="badge">Encabezados url, clave</span>
+                                <div className={styles.muted}>Tamaño recomendado &lt; 2MB</div>
+                                <div className={styles.badges}>
+                                    <span className={styles.badge}>.csv</span>
+                                    <span className={styles.badge}>Separador , o ;</span>
+                                    <span className={styles.badge}>Encabezados url, clave</span>
                                 </div>
                             </div>
-                            {/* input oculto para abrir el diálogo del sistema */}
+
+                            {/* input oculto */}
                             <input
                                 id="csv-hidden-input"
                                 type="file"
@@ -408,26 +337,37 @@ export default function RegistrarMultilink() {
                             />
                         </div>
 
-                        {/* Chip con el archivo seleccionado */}
+                        {/* Chip archivo seleccionado */}
                         {csvFile && (
-                            <div className="file-chip" aria-live="polite">
+                            <div className={styles.fileChip} aria-live="polite">
                                 <i className="bi bi-filetype-csv" aria-hidden />
-                                <div style={{display:'grid', gap:2}}>
-                                    <div style={{fontWeight:700}}>{csvFile.name}</div>
-                                    <div className="hint-sm">{(csvFile.size/1024).toFixed(1)} KB</div>
+                                <div style={{ display: "grid", gap: 2 }}>
+                                    <div style={{ fontWeight: 700 }}>{csvFile.name}</div>
+                                    <div className={styles.hintSm}>
+                                        {(csvFile.size / 1024).toFixed(1)} KB
+                                    </div>
                                 </div>
-                                <div className="actions">
-                                    <button type="button" className="icon-btn" onClick={clearCsv} title="Quitar archivo">
+                                <div className={styles.fileActions}>
+                                    <button
+                                        type="button"
+                                        className={styles.iconBtn}
+                                        onClick={clearCsv}
+                                        title="Quitar archivo"
+                                    >
                                         <i className="bi bi-x" aria-hidden />
                                     </button>
                                     <button
-                                        className="icon-btn"
+                                        className={styles.iconBtn}
                                         type="button"
                                         onClick={handleCSVRun}
                                         disabled={bulkRunning}
                                         title="Procesar CSV"
                                     >
-                                        {bulkRunning ? <i className="bi bi-hourglass-split" aria-hidden /> : <i className="bi bi-play-fill" aria-hidden />}
+                                        {bulkRunning ? (
+                                            <i className="bi bi-hourglass-split" aria-hidden />
+                                        ) : (
+                                            <i className="bi bi-play-fill" aria-hidden />
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -436,12 +376,10 @@ export default function RegistrarMultilink() {
                         {/* Barra de progreso */}
                         {bulkRunning && (
                             <div>
-                                <div className="progress" aria-label="Progreso de procesamiento">
-          <span style={{
-              width: `${bulkProgress.total ? Math.round((bulkProgress.done / bulkProgress.total) * 100) : 0}%`
-          }} />
+                                <div className={styles.progress} aria-label="Progreso de procesamiento">
+                                    <span style={{ width: `${progressPct}%` }} />
                                 </div>
-                                <div className="hint-sm" style={{marginTop:6}}>
+                                <div className={styles.hintSm} style={{ marginTop: 6 }}>
                                     {bulkProgress.done} / {bulkProgress.total} procesados
                                 </div>
                             </div>
@@ -450,8 +388,8 @@ export default function RegistrarMultilink() {
 
                     {/* Tabla de resultados */}
                     {bulkResults.length > 0 && (
-                        <div className="results" style={{marginTop:12}}>
-                            <table>
+                        <div className={styles.results} style={{ marginTop: 12 }}>
+                            <table className={styles.table}>
                                 <thead>
                                 <tr>
                                     <th>#</th>
@@ -465,8 +403,16 @@ export default function RegistrarMultilink() {
                                     <tr key={i}>
                                         <td>{i + 1}</td>
                                         <td>{r.url}</td>
-                                        <td className={r.status === "ok" ? "ok" : "err"}>
-                                            {r.status === "ok" ? <><i className="bi bi-check-circle" aria-hidden /> OK</> : <><i className="bi bi-exclamation-triangle" aria-hidden /> ERROR</>}
+                                        <td className={r.status === "ok" ? styles.ok : styles.err}>
+                                            {r.status === "ok" ? (
+                                                <>
+                                                    <i className="bi bi-check-circle" aria-hidden /> OK
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="bi bi-exclamation-triangle" aria-hidden /> ERROR
+                                                </>
+                                            )}
                                         </td>
                                         <td>{r.message}</td>
                                     </tr>
@@ -477,8 +423,16 @@ export default function RegistrarMultilink() {
                     )}
                 </div>
 
-                <div className="footer">
-                    Powered by <a href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{color:'#fff', textDecoration:'underline', textUnderlineOffset:'3px'}}>Gibra Company</a>
+                <div className={styles.footer}>
+                    Powered by{" "}
+                    <a
+                        href="https://www.gibracompany.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.linkAnchor}
+                    >
+                        Gibra Company
+                    </a>
                 </div>
             </div>
         </div>

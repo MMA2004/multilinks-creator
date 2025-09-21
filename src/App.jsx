@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Formulario from "./pages/formulario.jsx";
+import Formulario from "./pages/Formulario/formulario.jsx";
 import AccederMultilink from "./pages/AccederMultilink/AccederMultilink.jsx";
 import CrearMultilink from "./pages/crearMultiliks/crearMultilinks.jsx";
 import Login from "./pages/login/login.jsx";

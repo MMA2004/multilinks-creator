@@ -1,8 +1,17 @@
-import {useEffect, useState} from "react";
-import {storage} from "../../services/firebase.js";
-import {deleteObject, getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import { useEffect, useState } from "react";
+import { storage } from "../../services/firebase.js";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import styles from "./SubirImagen.module.css";
 
-function SubirImagen({ urlInicial = "", onUploadSuccess, onClickAdicional }) {
+/**
+ * SubirImagen
+ * Props:
+ * - urlInicial?: string
+ * - carpeta?: string  (default: "imagenes")
+ * - onUploadSuccess?: (url: string|null) => void
+ * - onClickAdicional?: () => void
+ */
+function SubirImagen({ urlInicial = "", carpeta = "imagenes", onUploadSuccess, onClickAdicional }) {
     const [archivo, setArchivo] = useState(null);
     const [url, setUrl] = useState("");
     const [path, setPath] = useState("");
@@ -13,25 +22,33 @@ function SubirImagen({ urlInicial = "", onUploadSuccess, onClickAdicional }) {
             setUrl(urlInicial);
             const pathExtraido = extraerPathDesdeURL(urlInicial);
             if (pathExtraido) setPath(pathExtraido);
+        } else {
+            setUrl("");
+            setPath("");
         }
     }, [urlInicial]);
 
     const handleArchivoChange = (e) => {
-        setArchivo(e.target.files[0] || null);
+        const f = e.target.files?.[0] || null;
+        setArchivo(f);
     };
 
     const subirImagen = async () => {
-        if (!archivo) return alert("Selecciona una imagen");
+        if (!archivo) {
+            alert("Selecciona una imagen");
+            return;
+        }
         try {
             setLoading(true);
-            const nombreUnico = `${Date.now()}-${archivo.name}`;
-            const rutaStorage = `imagenes/${nombreUnico}`;
+            const nombreSanit = archivo.name.replace(/\s+/g, "_");
+            const nombreUnico = `${Date.now()}-${nombreSanit}`;
+            const rutaStorage = `${carpeta}/${nombreUnico}`;
             const referencia = ref(storage, rutaStorage);
             await uploadBytes(referencia, archivo);
             const urlDescarga = await getDownloadURL(referencia);
             setUrl(urlDescarga);
             setPath(rutaStorage);
-            onUploadSuccess && onUploadSuccess(urlDescarga);
+            onUploadSuccess?.(urlDescarga);
         } catch (e) {
             console.error(e);
             alert("No se pudo subir la imagen.");
@@ -48,7 +65,7 @@ function SubirImagen({ urlInicial = "", onUploadSuccess, onClickAdicional }) {
             setUrl("");
             setArchivo(null);
             setPath("");
-            onUploadSuccess && onUploadSuccess(null);
+            onUploadSuccess?.(null);
         } catch (error) {
             console.error("Error al eliminar la imagen:", error);
             alert("No se pudo eliminar la imagen.");
@@ -58,33 +75,45 @@ function SubirImagen({ urlInicial = "", onUploadSuccess, onClickAdicional }) {
     };
 
     return (
-        <div className="uix-root">
-            <style>{styles}</style>
-
-            <div className="uix-row">
-                <label className="uix-file">
-                    <input type="file" onChange={handleArchivoChange} accept="image/*" />
-                    <span className="uix-file-label">
-            <i className="bi bi-image" aria-hidden></i>
+        <div className={styles.root}>
+            <div className={styles.row}>
+                <label className={styles.file}>
+                    <input
+                        type="file"
+                        onChange={handleArchivoChange}
+                        accept="image/*"
+                        aria-label="Seleccionar imagen"
+                    />
+                    <span className={styles.fileLabel}>
+            <i className="bi bi-image" aria-hidden />
                         {archivo ? archivo.name : "Seleccionar imagen"}
           </span>
                 </label>
 
                 <button
-                    className="uix-btn"
-                    onClick={() => { subirImagen(); onClickAdicional && onClickAdicional(); }}
+                    className={styles.btn}
+                    onClick={() => {
+                        subirImagen();
+                        onClickAdicional?.();
+                    }}
                     disabled={loading}
+                    type="button"
                 >
                     {loading ? "Subiendo…" : "Subir"}
                 </button>
             </div>
 
             {url && (
-                <div className="uix-preview">
-                    <div className="uix-imgwrap">
+                <div className={styles.preview}>
+                    <div className={styles.imgwrap}>
                         <img src={url} alt="Imagen subida" />
                     </div>
-                    <button className="uix-btn uix-danger" onClick={eliminarImagen} disabled={loading}>
+                    <button
+                        className={`${styles.btn} ${styles.danger}`}
+                        onClick={eliminarImagen}
+                        disabled={loading}
+                        type="button"
+                    >
                         {loading ? "Eliminando…" : "Eliminar imagen"}
                     </button>
                 </div>
@@ -93,35 +122,19 @@ function SubirImagen({ urlInicial = "", onUploadSuccess, onClickAdicional }) {
     );
 }
 
-// Esta función intenta reconstruir el path a partir de la URL pública
+/**
+ * Reconstruye el path de Storage desde una URL pública de Firebase:
+ * - Formato típico: https://firebasestorage.googleapis.com/v0/b/<bucket>/o/<path>%2Farchivo?alt=media&token=...
+ */
 function extraerPathDesdeURL(url) {
     try {
         const urlObj = new URL(url);
-        return decodeURIComponent(urlObj.pathname.split("/o/")[1].split("?\"")[0]);
+        const afterO = urlObj.pathname.split("/o/")[1] || "";
+        const beforeQuery = afterO.split("?")[0];
+        return decodeURIComponent(beforeQuery);
     } catch {
         return "";
     }
 }
 
 export default SubirImagen;
-
-const styles = `
-  .uix-root { color:#fff; }
-  .uix-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-
-  /* File input bonito */
-  .uix-file { position:relative; display:inline-block; }
-  .uix-file input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
-  .uix-file-label { display:inline-flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.30); font-weight:700; }
-
-  /* Botones */
-  .uix-btn { appearance:none; border:0; border-radius:12px; padding:10px 16px; font-weight:700; background:#111827; color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow: 0 10px 22px rgba(0,0,0,.25); }
-  .uix-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,0,0,.3); }
-  .uix-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
-  .uix-btn.uix-danger { background:#dc2626; }
-
-  /* Preview */
-  .uix-preview { margin-top:12px; text-align:center; }
-  .uix-imgwrap { display:inline-block; padding:8px; border-radius:16px; background: rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.20); backdrop-filter: blur(6px); }
-  .uix-imgwrap img { max-width:200px; border-radius:12px; display:block; }
-`;
