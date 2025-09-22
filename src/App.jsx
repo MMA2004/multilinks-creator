@@ -25,7 +25,7 @@ function App() {
                 <Route path="/editar/:id" element={<Formulario />} />
                 <Route path="/acceder" element={<AccederMultilink />} />
                 <Route path="/crear-multilink" element={<CrearMultilink />} />
-                <Route path="/registrar-multilink" element={<RegistrarMultilink />} />
+                {/*<Route path="/registrar-multilink" element={<RegistrarMultilink />} />*/}
                 <Route path="/mis-multilinks" element={<MisMultilinks />} />
                 <Route path="/estadisticas/:url" element={<Estadisticas />} />
                 <Route path="/formulario/:id" element={<FormularioCliente />} />
