@@ -168,7 +168,7 @@ export default function MisMultilinks() {
             <div className={styles.card}>
                 <div className={styles.head}>
                     <button
-                        className={`${styles.btn} ${styles.linkBtn}`}
+                        className={`${styles.btn} `}
                         onClick={() => navigate(-1)}
                         type="button"
                         style={{ minWidth: "fit-content" }}

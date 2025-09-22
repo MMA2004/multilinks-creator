@@ -11,7 +11,7 @@ import styles from "./subirImagen.module.css";
  * - onUploadSuccess?: (url: string|null) => void
  * - onClickAdicional?: () => void
  */
-function SubirImagen({ urlInicial = "", carpeta = "imagenes", onUploadSuccess, onClickAdicional }) {
+function SubirImagen({ urlInicial = "", carpeta = "imagenes", onUploadSuccess}) {
     const [archivo, setArchivo] = useState(null);
     const [url, setUrl] = useState("");
     const [path, setPath] = useState("");
@@ -94,7 +94,6 @@ function SubirImagen({ urlInicial = "", carpeta = "imagenes", onUploadSuccess, o
                     className={styles.btn}
                     onClick={() => {
                         subirImagen();
-                        onClickAdicional?.();
                     }}
                     disabled={loading}
                     type="button"

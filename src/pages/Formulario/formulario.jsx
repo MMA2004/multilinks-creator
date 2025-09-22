@@ -165,6 +165,7 @@ function Formulario() {
                     <button type="button" className={styles.btn} onClick={guardarYGenerar}>
                         <i className="bi bi-save2" /> Guardar
                     </button>
+                    {/*
                     <button
                         type="button"
                         className={`${styles.btn} ${styles.outline}`}
@@ -172,6 +173,7 @@ function Formulario() {
                     >
                         <i className="bi bi-braces" /> Imprimir JSON
                     </button>
+                    */}
                 </div>
             </div>
 
@@ -328,7 +330,6 @@ function Formulario() {
                                 <SubirImagen
                                     urlInicial={formData.imagen}
                                     onUploadSuccess={(url) => setFormData({ ...formData, imagen: url })}
-                                    onClickAdicional={guardarYGenerar}
                                 />
                             </div>
 

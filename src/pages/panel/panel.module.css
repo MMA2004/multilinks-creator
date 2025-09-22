@@ -6,28 +6,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(120deg, #0ea5e9, #8b5cf6, #14b8a6);
-    background-size: 180% 180%;
-    animation: gradientMove 12s ease infinite;
-}
 
-@keyframes gradientMove {
-    0% { background-position: 0 50% }
-    50% { background-position: 100% 50% }
-    100% { background-position: 0 50% }
+    /* Fondo corporativo: negro + patrón sutil */
+    background-color: #010101;
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
 .card {
     width: 100%;
     max-width: 900px;
-    color: #fff;
+    color: #ffffff;
     padding: 28px;
     border-radius: 22px;
-    background: rgba(255, 255, 255, .10);
-    border: 1px solid rgba(255, 255, 255, .25);
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
 }
 
 .header {
@@ -51,9 +47,10 @@
     border-radius: 12px;
     display: grid;
     place-items: center;
-    background: rgba(255, 255, 255, .15);
-    border: 1px solid rgba(255, 255, 255, .25);
+    background: rgba(58,172,214,0.15); /* azul translúcido */
+    border: 1px solid rgba(255,255,255,0.25);
     font-weight: 800;
+    color: #3aacd6; /* azul marca */
 }
 
 .title {
@@ -61,11 +58,13 @@
     font-weight: 800;
     line-height: 1.1;
     margin: 0;
+    color: #ffffff;
 }
 
 .role {
-    opacity: .9;
+    opacity: .85;
     font-size: 13px;
+    color: #ffffff;
 }
 
 .grid {
@@ -84,51 +83,57 @@
     background: rgba(255, 255, 255, .08);
     border: 1px solid rgba(255, 255, 255, .20);
     transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+    color: #ffffff;
 }
 
 .action:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(0,0,0,.28);
+    box-shadow: 0 12px 28px rgba(0,0,0,.35);
+    background: rgba(58,172,214,.18); /* azul translúcido al hover */
+    border-color: #3aacd6;
 }
 
 .icon {
     font-size: 22px;
     margin-bottom: 10px;
     display: inline-block;
+    color: #3aacd6; /* iconos en azul */
 }
 
 .actTitle {
     font-weight: 800;
     margin-bottom: 6px;
+    color: #ffffff;
 }
 
 .actDesc {
     opacity: .9;
     font-size: 14px;
+    color: #ffffff;
 }
 
-/* Botón “glass” reutilizable (para el nuevo botón) */
+/* Botón estilo glass adaptado */
 .btnGlass {
     appearance: none;
-    border: 1px solid rgba(255, 255, 255, .30);
-    background: rgba(255, 255, 255, .18);
-    color: #fff;
+    border: 1px solid #3aacd6;
+    background: rgba(58,172,214,0.15);
+    color: #ffffff;
     font-weight: 700;
     padding: 12px 14px;
     border-radius: 14px;
     cursor: pointer;
-    transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+    transition: transform .15s ease, box-shadow .15s ease, background .2s ease, color .2s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     width: 100%;
 }
-
 .btnGlass:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(0,0,0,.25);
-    background: rgba(255, 255, 255, .22);
+    box-shadow: 0 10px 24px rgba(0,0,0,.35);
+    background: #3aacd6;
+    color: #010101;
 }
 
 .btnRow {
@@ -137,15 +142,15 @@
     grid-template-columns: 1fr;
 }
 
-/* footer */
+/* Footer */
 .footer {
     margin-top: 22px;
     opacity: .9;
     font-size: 12px;
+    color: #ffffff;
 }
-
 .footerLink {
-    color: #fff;
+    color: #3aacd6;
     text-decoration: underline;
     text-underline-offset: 3px;
 }
@@ -153,9 +158,9 @@
 /* Accesibilidad */
 .action:focus-visible,
 .btnGlass:focus-visible {
-    outline: 3px solid rgba(255,255,255,.9);
+    outline: 3px solid #3aacd6;
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(14,165,233,.45);
+    box-shadow: 0 0 0 4px rgba(58,172,214,.4);
 }
 
 /* Reduce motion */
@@ -163,3 +168,115 @@
     .panelRoot { animation: none; }
     .action, .btnGlass { transition: none; }
 }
+
+/* ===== Mobile-first hardening ===== */
+
+/* Consistencia y safe-areas (iPhone notch) */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+
+.panelRoot {
+    /* Usa dvh para evitar el bug de vh en móviles */
+    min-height: 100dvh;
+    /* Safe areas + padding compacto en móviles */
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    overflow-x: hidden; /* evita scroll lateral */
+}
+
+/* La card nunca “rompe” el viewport */
+.card {
+    width: min(100%, 900px);
+    margin: 0 auto;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+/* Tipografía más compacta y que rompa bien */
+.title { font-size: clamp(20px, 5vw, 28px); }
+.role, .actDesc, .label { line-height: 1.35; }
+.title, .actTitle, .actDesc, .btnGlass, .footer, .role {
+    overflow-wrap: anywhere; /* rompe palabras largas/URLs */
+    word-break: break-word;
+}
+
+/* Grid: 1 columna en pantallas estrechas */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* Tarjetas de acción con padding seguro */
+.action {
+    padding: 14px;
+    border-radius: 14px;
+    min-width: 0; /* permite que el contenido encoja sin desbordar */
+}
+
+/* Icono e insignia no empujan el layout */
+.icon { font-size: 20px; line-height: 1; }
+.badge { flex: 0 0 40px; width: 40px; height: 40px; }
+
+/* Botones: ancho completo, altura táctil, sin desbordes */
+.btnRow { grid-template-columns: 1fr; }
+.btnGlass {
+    width: 100%;
+    min-height: 44px;          /* objetivo táctil iOS */
+    white-space: normal;       /* permite salto de línea */
+    line-height: 1.2;
+    padding: 12px 14px;
+}
+
+/* Inputs: evita zoom automático de iOS (<16px) */
+input, select, textarea {
+    font-size: 16px; /* clave para que iOS no haga zoom al enfocar */
+}
+
+/* Toggle de contraseña bien centrado y sin empujar */
+.inputWrap { position: relative; min-width: 0; }
+.togglePwd {
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    max-width: 40%;
+    white-space: nowrap;
+}
+
+/* Header apilable en pantallas estrechas */
+.header {
+    align-items: flex-start;
+    gap: 10px;
+}
+
+/* Footer no se sale */
+.footer, .footerLink { overflow-wrap: anywhere; }
+
+/* ===== Escalado progresivo en pantallas mayores ===== */
+@media (min-width: 480px) {
+    .card { padding: 24px; border-radius: 18px; }
+    .grid { gap: 14px; }
+}
+
+@media (min-width: 640px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 960px) {
+    .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card { padding: 28px; border-radius: 22px; }
+}
+
+/* ===== Soporte: dvh en navegadores que lo soportan ===== */
+@supports (height: 100dvh) {
+    .panelRoot { min-height: 100dvh; }
+}
+

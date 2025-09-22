@@ -109,7 +109,7 @@ export default function IconPicker({ value = "", onChange }) {
                             autoFocus
                         />
                         <button className={styles.clear} onClick={() => setQ("")} title="Limpiar">
-                            <i className="bi bi-x-lg" />
+                            <i className="bi bi-trash3-fill" />
                         </button>
                     </div>
 

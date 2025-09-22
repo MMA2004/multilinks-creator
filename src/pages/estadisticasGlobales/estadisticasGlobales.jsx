@@ -156,7 +156,7 @@ export default function EstadisticasGlobales() {
         <div className={styles.root}>
             <div className={styles.card}>
                 <div className={styles.head}>
-                    <button className={styles.btn} onClick={() => navigate(-1)} type="button">
+                    <button className={styles.btn} onClick={() => navigate(-1)} type="button" style={{ minWidth: "fit-content", marginBottom: 12 }} >
                         <i className="bi bi-arrow-left" aria-hidden></i> Volver
                     </button>
                 </div>

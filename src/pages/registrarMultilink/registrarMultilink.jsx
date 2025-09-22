@@ -219,7 +219,7 @@ export default function RegistrarMultilink() {
         <div className={styles.root}>
             <div className={styles.card}>
                 <button
-                    className={`${styles.btn} ${styles.link}`}
+                    className={`${styles.btn}`}
                     onClick={() => navigate(-1)}
                     type="button"
                     style={{ minWidth: "fit-content", marginBottom: 12 }}
