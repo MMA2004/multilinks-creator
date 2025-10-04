@@ -13,6 +13,7 @@ import FormularioCliente from "./pages/formularioClientes/formularioClientes.jsx
 import ResFormulario from "./pages/ResFormulario/ResFormulario.jsx";
 import AdminTools from "./pages/tools/tools.jsx";
 import EstadisticasGlobales from "./pages/estadisticasGlobales/estadisticasGlobales.jsx";
+import OlvideClave from "./pages/OlvideClave/OlvideClave.jsx";
 
 function App() {
     return (
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/respuestas/:url" element={<ResFormulario />} />
                 <Route path="/admin-tools" element={<AdminTools />} />
                 <Route path="/estadisticas-globales" element={<EstadisticasGlobales />} />
+                <Route path="/olvide-clave" element={<OlvideClave />} />
             </Routes>
         </Router>
     );

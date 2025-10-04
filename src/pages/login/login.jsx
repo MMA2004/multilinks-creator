@@ -99,6 +99,9 @@ export default function Login() {
                             <Link to="/registro">¿No tienes cuenta? Regístrate</Link>
                         </div>
                         <div className={styles.link}>
+                            <Link to="/olvide-clave">¿Olvidaste tu contraseña?</Link>
+                        </div>
+                        <div className={styles.link}>
                             <Link to="/">Volver al inicio</Link>
                         </div>
                     </div>
