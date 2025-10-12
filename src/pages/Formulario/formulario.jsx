@@ -12,6 +12,20 @@ function Formulario() {
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const FUENTES = [
+        "Arial",
+        "Georgia",
+        "Times New Roman",
+        "Roboto",
+        "Open Sans",
+        "Lato",
+        "Montserrat",
+        "Playfair Display",
+        "Source Sans Pro",
+        "Poppins",
+        "Nunito",
+    ];
+
     const [formData, setFormData] = useState({
         titulo_pagina: "",
         titulo: "",
@@ -38,6 +52,9 @@ function Formulario() {
         contacto_borde_grosor: "",
         nombre: "",
         nota: "",
+        fuente_titulo: "Arial",
+        fuente_subtitulo: "Arial",
+        fuente_general: "Arial",
         botones: [
             {
                 url: "",
@@ -325,6 +342,97 @@ function Formulario() {
 
                             <hr className={styles.hr} />
 
+                            <div className="mb-3">
+                                <h4 className={styles.h4}>Tipografía</h4>
+
+                                <div className="mb-3">
+                                    <label className={styles.label}>Fuente del Título</label>
+                                    <div className={styles.selectWrap}>
+                                        <select
+                                            className={`${styles.input} ${styles.select}`}
+                                            name="fuente_titulo"
+                                            value={formData.fuente_titulo}
+                                            onChange={handleChange}
+                                        >
+                                            {/* Si quieres permitir heredar por defecto, habilita esta opción */}
+                                            {/* <option value="">Por defecto (heredar)</option> */}
+                                            {FUENTES.map((f) => (
+                                                <option key={f} value={f} style={{ fontFamily: f }}>
+                                                    {f}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <span className={styles.caret} aria-hidden>▾</span>
+                                    </div>
+
+                                    <div
+                                        className={styles.fontPreview}
+                                        style={{ fontFamily: formData.fuente_titulo || "inherit" }}
+                                        aria-label="Vista previa fuente título"
+                                    >
+                                        Aa Bb Cc — Título de ejemplo
+                                    </div>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className={styles.label}>Fuente del Subtítulo</label>
+                                    <div className={styles.selectWrap}>
+                                        <select
+                                            className={`${styles.input} ${styles.select}`}
+                                            name="fuente_subtitulo"
+                                            value={formData.fuente_subtitulo}
+                                            onChange={handleChange}
+                                        >
+                                            {/* <option value="">Por defecto (heredar)</option> */}
+                                            {FUENTES.map((f) => (
+                                                <option key={f} value={f} style={{ fontFamily: f }}>
+                                                    {f}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <span className={styles.caret} aria-hidden>▾</span>
+                                    </div>
+
+                                    <div
+                                        className={styles.fontPreview}
+                                        style={{ fontFamily: formData.fuente_subtitulo || "inherit" }}
+                                        aria-label="Vista previa fuente subtítulo"
+                                    >
+                                        Aa Bb Cc — Subtítulo de ejemplo
+                                    </div>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className={styles.label}>Fuente General</label>
+                                    <div className={styles.selectWrap}>
+                                        <select
+                                            className={`${styles.input} ${styles.select}`}
+                                            name="fuente_general"
+                                            value={formData.fuente_general}
+                                            onChange={handleChange}
+                                        >
+                                            {/* <option value="">Por defecto (heredar)</option> */}
+                                            {FUENTES.map((f) => (
+                                                <option key={f} value={f} style={{ fontFamily: f }}>
+                                                    {f}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <span className={styles.caret} aria-hidden>▾</span>
+                                    </div>
+
+                                    <div
+                                        className={styles.fontPreview}
+                                        style={{ fontFamily: formData.fuente_general || "inherit" }}
+                                        aria-label="Vista previa fuente general"
+                                    >
+                                        Aa Bb Cc — Texto de ejemplo
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr className={styles.hr} />
+
                             <div className="mb-2">
                                 <h4 className={styles.h4}>Subir imagen</h4>
                                 <SubirImagen
@@ -595,4 +703,3 @@ function Formulario() {
 }
 
 export default Formulario;
-

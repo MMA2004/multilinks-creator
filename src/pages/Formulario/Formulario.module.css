@@ -257,3 +257,55 @@ input[type="submit"] { -webkit-appearance:none; appearance:none; background:none
     .check { justify-content: flex-start; }
 }
 
+/* Contenedor para custom caret */
+.selectWrap {
+    position: relative;
+    display: grid;
+    align-items: center;
+}
+
+/* Hereda base de .input, pero quita el look nativo y agrega espacio para el caret */
+.select {
+    appearance: none;           /* Firefox/Chromium */
+    -webkit-appearance: none;   /* Safari iOS */
+    padding-right: 40px;        /* espacio para el caret */
+    background: rgba(255,255,255,.98);
+    cursor: pointer;
+}
+
+/* Caret (flecha) */
+.caret {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    font-size: 16px;
+    opacity: .8;
+    color: #0f172a;
+}
+
+/* Vista previa de fuente */
+.fontPreview {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Hover/focus refinados para el select */
+.select:hover {
+    background: #ffffff;
+}
+
+.select:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(58,172,214,.25);
+    border-color: #3aacd6;
+}
+

@@ -1,4 +1,5 @@
 // src/pages/VistaPrevia.jsx
+import React from 'react';
 import './vistaPrevia.css';
 
 function VistaPrevia({ data }) {
@@ -24,7 +25,35 @@ function VistaPrevia({ data }) {
         contacto_color = 'white',
         contacto_borde_grosor = '0',
         contacto_borde_color = '#000000',
+        fuente_titulo = '',
+        fuente_subtitulo = '',
+        fuente_general = '',
     } = data;
+
+    // Función para cargar fuentes web dinámicamente
+    const cargarFuenteWeb = (fuente) => {
+        if (!fuente || ['Arial', 'Helvetica', 'Georgia', 'Times New Roman'].includes(fuente)) {
+            return; // No cargar fuentes del sistema
+        }
+
+        const linkId = `font-${fuente.replace(/\s+/g, '-').toLowerCase()}`;
+        if (document.getElementById(linkId)) {
+            return; // Ya está cargada
+        }
+
+        const link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${fuente.replace(/\s+/g, '+')}:wght@300;400;500;600;700&display=swap`;
+        document.head.appendChild(link);
+    };
+
+    // Cargar las fuentes cuando cambien
+    React.useEffect(() => {
+        cargarFuenteWeb(fuente_titulo);
+        cargarFuenteWeb(fuente_subtitulo);
+        cargarFuenteWeb(fuente_general);
+    }, [fuente_titulo, fuente_subtitulo, fuente_general]);
 
     return (
         <div
@@ -38,7 +67,8 @@ function VistaPrevia({ data }) {
                         color: color_titulo,
                         fontSize: tamano_titulo,
                         marginBottom: mb_titulo,
-                        marginTop: mt_titulo
+                        marginTop: mt_titulo,
+                        fontFamily: fuente_titulo
                     }}
                 >
                     {titulo}
@@ -48,7 +78,8 @@ function VistaPrevia({ data }) {
                         color: color_subtitulo,
                         fontSize: tamano_subtitulo,
                         marginBottom: mb_subtitulo,
-                        marginTop: mt_subtitulo
+                        marginTop: mt_subtitulo,
+                        fontFamily: fuente_subtitulo
                     }}
                 >
                     {subtitulo}
@@ -63,7 +94,8 @@ function VistaPrevia({ data }) {
                             style={{
                                 backgroundColor: boton.bg_color || 'white',
                                 color: boton.text_color,
-                                border: `${boton.borde_grosor}px solid ${boton.borde_color}`
+                                border: `${boton.borde_grosor}px solid ${boton.borde_color}`,
+                                fontFamily: fuente_general
                             }}
                         >
                             <i
@@ -77,14 +109,14 @@ function VistaPrevia({ data }) {
 
                 {mostrar_boton_contacto && (
                     <a href="#" download>
-                        <button className="guardar" style={{ backgroundColor: contacto_bg, color: contacto_color, border: `${contacto_borde_grosor}px solid ${contacto_borde_color}` }}>
+                        <button className="guardar" style={{ backgroundColor: contacto_bg, color: contacto_color, border: `${contacto_borde_grosor}px solid ${contacto_borde_color}`, fontFamily: fuente_general }}>
                             Guardar Contacto
                         </button>
                     </a>
                 )}
 
-                <footer style={{ color: color_footer }}>
-                    Powered by <a href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: color_footer }}>Gibra Company</a>
+                <footer style={{ color: color_footer, fontFamily: fuente_general }}>
+                    Powered by <a href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: color_footer, fontFamily: fuente_general }}>Gibra Company</a>
                 </footer>
             </div>
         </div>
