@@ -150,3 +150,15 @@ button { -webkit-appearance:none; appearance:none; background:none; color:inheri
     .head { grid-template-columns: 1fr; }
     .btn { width: 100%; justify-content: center; } /* si prefieres solo algunos, usa .btnFullMobile */
 }
+
+.info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}

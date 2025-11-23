@@ -76,6 +76,11 @@ export default function Estadisticas() {
                     </a>
                 </div>
 
+                <div className={styles.info}>
+                    <i className="bi bi-info-circle" aria-hidden></i>
+                    <span>Mostrando datos de los últimos 90 días.</span>
+                </div>
+
                 {loading && <div className={styles.loading}>Cargando…</div>}
                 {error && (
                     <div className={styles.error} role="alert">
