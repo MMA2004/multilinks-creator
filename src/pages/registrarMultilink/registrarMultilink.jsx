@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { db } from "../../services/firebase";
 import {
-    collection, query, where, getDocs, updateDoc, doc, arrayUnion
+    collection, query, where, getDocs, doc
 } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import styles from "./RegistrarMultilink.module.css";
+import { runTransaction } from "firebase/firestore";
 
 export default function RegistrarMultilink() {
     const [url, setUrl] = useState("");
@@ -24,30 +25,60 @@ export default function RegistrarMultilink() {
     const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0 });
 
     const registerOne = async (urlTrim, claveTrim) => {
-        // Retorna {ok: boolean, message: string}
         const qy = query(
             collection(db, "multilinks"),
             where("url", "==", urlTrim),
             where("clave_edicion", "==", claveTrim)
         );
-        const snap = await getDocs(qy);
 
+        const snap = await getDocs(qy);
         if (snap.empty) return { ok: false, message: "URL o clave incorrecta." };
 
         const docSnap = snap.docs[0];
-        const data = docSnap.data();
-
-        if (data.uid && data.uid !== usuario.uid) {
-            return { ok: false, message: "Este multilink ya está registrado por otro usuario." };
-        }
-
         const docRef = doc(db, "multilinks", docSnap.id);
-        await updateDoc(docRef, {
-            uid: usuario.uid,
-            miembros: arrayUnion(usuario.uid),
-        });
 
-        return { ok: true, message: "Registrado." };
+        try {
+            const result = await runTransaction(db, async (tx) => {
+                const fresh = await tx.get(docRef);
+                if (!fresh.exists()) return { ok: false, message: "El multilink ya no existe." };
+
+                const data = fresh.data();
+
+                // seguridad extra: revalidar clave (por si cambió entre query y tx)
+                if (data.clave_edicion !== claveTrim) {
+                    return { ok: false, message: "URL o clave incorrecta." };
+                }
+
+                const uid = usuario.uid;
+                const miembros = Array.isArray(data.miembros) ? data.miembros : [];
+                const max = Number(data.max_miembros ?? 1);
+
+                // ya registrado por este usuario
+                if (miembros.includes(uid)) {
+                    return { ok: true, message: "Ya estaba registrado en tu cuenta." };
+                }
+
+                // cupos llenos
+                if (miembros.length >= max + 1) {
+                    return { ok: false, message: `Este multilink ya alcanzó el límite de ${max} cuenta(s).` };
+                }
+
+                const nuevosMiembros = [...miembros, uid];
+
+                tx.update(docRef, {
+                    miembros: nuevosMiembros,
+                    // asigna dueño principal si aún no existe
+                    uid_principal: data.uid_principal ?? uid,
+                });
+
+                return { ok: true, message: "Registrado." };
+            });
+
+            return result;
+        } catch (err) {
+            console.error(err);
+            return { ok: false, message: "No se pudo registrar (intenta de nuevo)." };
+        }
     };
 
     const handleSubmit = async (e) => {

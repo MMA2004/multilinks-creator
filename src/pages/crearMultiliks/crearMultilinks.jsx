@@ -14,6 +14,7 @@ export default function CrearMultilink() {
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPwd, setShowPwd] = useState(false);
+    const [maxMiembros, setMaxMiembros] = useState(1);
 
     const navigate = useNavigate();
     const esAdmin = useAdmin();
@@ -97,8 +98,11 @@ export default function CrearMultilink() {
                 url: urlNorm,
                 clave_edicion: clave,
                 creado_en: new Date(),
-                admin_uid: usuario.uid, // admin creador
-                uid: null, // dueño (cliente) aún no asignado
+                admin_uid: usuario.uid,
+
+                // ✅ nuevo
+                max_miembros: Number(maxMiembros) || 1,
+                uid_principal: null,
                 miembros: [usuario.uid],
             });
 
@@ -219,6 +223,26 @@ export default function CrearMultilink() {
                             >
                                 {showPwd ? "Ocultar" : "Ver"}
                             </button>
+                        </div>
+                    </div>
+
+                    <div className={styles.field}>
+                        <label className={styles.label} htmlFor="maxMiembros">
+                            ¿Cuántas cuentas pueden registrarlo?
+                        </label>
+
+                        <input
+                            id="maxMiembros"
+                            className={styles.input}
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={maxMiembros}
+                            onChange={(e) => setMaxMiembros(Math.max(1, Number(e.target.value || 1)))}
+                        />
+
+                        <div className={styles.hint}>
+                            Ej: 1 = solo una cuenta, 2 = dos cuentas pueden registrarlo, etc.
                         </div>
                     </div>
 

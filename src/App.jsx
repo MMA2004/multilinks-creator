@@ -21,7 +21,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Inicio />} />
                 <Route path="/login" element={<Login />} />
-                /*<Route path="/registro" element={<Registro />} />
+                <Route path="/registro" element={<Registro />} />
                 <Route path="/panel" element={<Panel />} />
                 <Route path="/editar/:id" element={<Formulario />} />
                 <Route path="/acceder" element={<AccederMultilink />} />
