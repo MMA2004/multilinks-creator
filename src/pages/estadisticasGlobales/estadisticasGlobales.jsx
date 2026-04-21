@@ -4,21 +4,29 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import * as XLSX from "xlsx";
 import { db } from "../../services/firebase";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useAdmin } from "../../hooks/useAdmin.js";
 import { useNavigate } from "react-router-dom";
 import styles from "./EstadisticasGlobales.module.css";
 
 export default function EstadisticasGlobales() {
     const { usuario } = useAuth();
+    const isAdmin = useAdmin();
     const [multilinks, setMultilinks] = useState([]); // {id, url, ...}
     const [rows, setRows] = useState([]);             // filas consolidadas por multilink
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [mes, setMes] = useState("");
+    const [searchUrl, setSearchUrl] = useState("");
+    const [selectedUrls, setSelectedUrls] = useState([]);
 
     const navigate = useNavigate();
 
     // --- helper para llamar tu API por subdominio ---
-    const fetchStatsBySubdomain = async (subdominio, signal) => {
-        const endpoint = `https://api.gibracompany.com/api/stats/${subdominio}`;
+    const fetchStatsBySubdomain = async (subdominio, mesFiltro, signal) => {
+        let endpoint = `https://api.gibracompany.com/api/stats/${subdominio}`;
+        if (mesFiltro) {
+            endpoint += `?mes=${mesFiltro}`;
+        }
         const res = await fetch(endpoint, { signal });
         if (!res.ok) throw new Error(`Error API stats: ${subdominio}`);
         return res.json();
@@ -29,17 +37,23 @@ export default function EstadisticasGlobales() {
         const load = async () => {
             if (!usuario) return;
             try {
-                const qy = query(collection(db, "multilinks"), where("uid", "==", usuario.uid));
+                let qy;
+                if (isAdmin) {
+                    qy = query(collection(db, "multilinks"));
+                } else {
+                    qy = query(collection(db, "multilinks"), where("uid", "==", usuario.uid));
+                }
                 const snap = await getDocs(qy);
                 const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
                 setMultilinks(data);
+                setSelectedUrls(data.map((m) => `${m.url}.gibracompany.com`));
             } catch (e) {
                 console.error(e);
                 setError("Error cargando multilinks.");
             }
         };
         load();
-    }, [usuario]);
+    }, [usuario, isAdmin]);
 
     // 2) Por cada multilink, traer stats desde tu API y armar filas
     useEffect(() => {
@@ -57,7 +71,7 @@ export default function EstadisticasGlobales() {
                 const settled = await Promise.allSettled(
                     multilinks.map(async (m) => {
                         const subdominio = `${m.url}.gibracompany.com`;
-                        const data = await fetchStatsBySubdomain(subdominio, controller.signal);
+                        const data = await fetchStatsBySubdomain(subdominio, mes, controller.signal);
                         return {
                             url: subdominio,
                             visitas: data?.visitas_totales ?? 0,
@@ -88,11 +102,11 @@ export default function EstadisticasGlobales() {
 
         loadStats();
         return () => controller.abort();
-    }, [multilinks]);
+    }, [multilinks, mes]);
 
     // 3) Totales globales
     const totales = useMemo(() => {
-        return rows.reduce(
+        return rows.filter((r) => selectedUrls.includes(r.url)).reduce(
             (acc, r) => {
                 acc.visitas += r.visitas;
                 acc.clicks += r.clicksTotales;
@@ -100,17 +114,18 @@ export default function EstadisticasGlobales() {
             },
             { visitas: 0, clicks: 0 }
         );
-    }, [rows]);
+    }, [rows, selectedUrls]);
 
     // 4) Exportación CSV/Excel (columnas dinámicas por botón)
     const exportar = (formato) => {
-        if (!rows.length) return;
+        const rowsToExport = rows.filter((r) => selectedUrls.includes(r.url));
+        if (!rowsToExport.length) return;
 
         const setBotones = new Set();
-        rows.forEach((r) => Object.keys(r.clicksPorBoton || {}).forEach((k) => setBotones.add(k)));
+        rowsToExport.forEach((r) => Object.keys(r.clicksPorBoton || {}).forEach((k) => setBotones.add(k)));
         const botones = Array.from(setBotones).sort();
 
-        const datos = rows.map((r) => {
+        const datos = rowsToExport.map((r) => {
             const base = {
                 URL: r.url,
                 "Visitas totales": r.visitas,
@@ -129,7 +144,7 @@ export default function EstadisticasGlobales() {
             "Clicks totales": totales.clicks,
         };
         botones.forEach((b) => {
-            totalRow[`Clicks ${b}`] = rows.reduce((acc, r) => acc + (r.clicksPorBoton?.[b] ?? 0), 0);
+            totalRow[`Clicks ${b}`] = rowsToExport.reduce((acc, r) => acc + (r.clicksPorBoton?.[b] ?? 0), 0);
         });
         datos.push(totalRow);
 
@@ -146,11 +161,29 @@ export default function EstadisticasGlobales() {
     };
 
     // --- columnas dinámicas para la tabla en pantalla ---
+    const filteredRows = useMemo(() => {
+        return rows.filter((r) => r.url.toLowerCase().includes(searchUrl.toLowerCase()));
+    }, [rows, searchUrl]);
+
     const allButtons = useMemo(() => {
         const s = new Set();
-        rows.forEach((r) => Object.keys(r.clicksPorBoton || {}).forEach((k) => s.add(k)));
+        filteredRows.forEach((r) => Object.keys(r.clicksPorBoton || {}).forEach((k) => s.add(k)));
         return Array.from(s).sort();
-    }, [rows]);
+    }, [filteredRows]);
+
+    const handleToggleAll = (e) => {
+        if (e.target.checked) {
+            setSelectedUrls(filteredRows.map(r => r.url));
+        } else {
+            setSelectedUrls([]);
+        }
+    };
+
+    const handleTogglePage = (url) => {
+        setSelectedUrls((prev) => 
+            prev.includes(url) ? prev.filter(u => u !== url) : [...prev, url]
+        );
+    };
 
     return (
         <div className={styles.root}>
@@ -180,7 +213,28 @@ export default function EstadisticasGlobales() {
                     </div>
                 </div>
 
-                <div className={styles.controls}>
+                <div className={styles.controls} style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <label htmlFor="searchUrlFilter" style={{ fontWeight: 600 }}>URL:</label>
+                        <input
+                            id="searchUrlFilter"
+                            type="text"
+                            placeholder="Buscar URL..."
+                            value={searchUrl}
+                            onChange={(e) => setSearchUrl(e.target.value)}
+                            style={{ padding: "6px", borderRadius: "5px", border: "1px solid #ccc", minWidth: "150px" }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <label htmlFor="mesFilter" style={{ fontWeight: 600 }}>Mes:</label>
+                        <input
+                            id="mesFilter"
+                            type="month"
+                            value={mes}
+                            onChange={(e) => setMes(e.target.value)}
+                            style={{ padding: "6px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        />
+                    </div>
                     <button className={styles.btn} onClick={() => exportar("csv")} type="button">
                         Descargar CSV
                     </button>
@@ -192,13 +246,22 @@ export default function EstadisticasGlobales() {
                 {loading ? (
                     <div className={styles.loading}>Cargando…</div>
                 ) : rows.length === 0 ? (
-                    <div className={styles.empty}>No hay datos.</div>
+                    <div className={styles.empty}>No hay datos en general.</div>
+                ) : filteredRows.length === 0 ? (
+                    <div className={styles.empty}>No hay resultados para esta búsqueda.</div>
                 ) : (
                     <>
                         <div className={styles.tableWrap}>
                             <table className={styles.table}>
                                 <thead>
                                 <tr>
+                                    <th>
+                                        <input
+                                            type="checkbox"
+                                            onChange={handleToggleAll}
+                                            checked={selectedUrls.length === filteredRows.length && filteredRows.length > 0}
+                                        />
+                                    </th>
                                     <th>URL</th>
                                     <th>Visitas</th>
                                     <th>Clicks totales</th>
@@ -210,8 +273,15 @@ export default function EstadisticasGlobales() {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {rows.map((r) => (
+                                {filteredRows.map((r) => (
                                     <tr key={r.url}>
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUrls.includes(r.url)}
+                                                onChange={() => handleTogglePage(r.url)}
+                                            />
+                                        </td>
                                         <td>{r.url}</td>
                                         <td>{r.visitas}</td>
                                         <td>{r.clicksTotales}</td>
@@ -243,10 +313,10 @@ export default function EstadisticasGlobales() {
                             </table>
                         </div>
 
-                        {rows.some((r) => Object.keys(r.clicksPorBoton || {}).length) && (
+                        {filteredRows.some((r) => Object.keys(r.clicksPorBoton || {}).length) && (
                             <div className={styles.section}>
                                 <h5>Detalle de clicks por botón</h5>
-                                {rows.map((r) => (
+                                {filteredRows.map((r) => (
                                     <div key={`detalle-${r.url}`} style={{ marginBottom: 12 }}>
                                         <strong>{r.url}</strong>
                                         {Object.keys(r.clicksPorBoton || {}).length === 0 ? (
