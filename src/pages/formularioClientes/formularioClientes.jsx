@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../services/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { toast } from "react-hot-toast";
-import {enviarFormularioAlServidor} from "../../services/apiFormulario.js";
 
 function FormularioCliente() {
     const { id } = useParams(); // este es el ID del multilink
@@ -42,7 +41,11 @@ function FormularioCliente() {
         });
 
         try {
-            await enviarFormularioAlServidor(multilinkUrl, respuestasEtiquetadas);
+            await addDoc(collection(db, "respuestas_formulario"), {
+                multilink_url: multilinkUrl,
+                respuestas: respuestasEtiquetadas,
+                timestamp: new Date().toISOString()
+            });
             toast.success("Enviado con éxito");
             setEnviado(true);
         } catch (err) {
@@ -51,39 +54,83 @@ function FormularioCliente() {
         }
     };
 
-    if (enviado) return <p>Gracias por enviar tu información.</p>;
+    if (enviado) {
+        return (
+            <div className={styles.root}>
+                <div className={styles.card}>
+                    <div className={styles.successCard}>
+                        <i className={`bi bi-check-circle-fill ${styles.successIcon}`}></i>
+                        <div className={styles.successTitle}>¡Recibido!</div>
+                        <div className={styles.successText}>
+                            Gracias por tu mensaje. Nos pondremos en contacto contigo pronto.
+                        </div>
+                    </div>
+                    <div className={styles.footer}>
+                        Powered by{" "}
+                        <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer">
+                            Gibra Company
+                        </a>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <form onSubmit={handleSubmit} style={{ padding: "2rem" }}>
-            <h2>Formulario</h2>
-            {campos.map((campo, i) => (
-                <div key={i} style={{ marginBottom: "1rem" }}>
-                    <label>{campo.label}</label><br />
-                    {campo.tipo === "textarea" ? (
-                        <textarea
-                            name={campo.nombre}
-                            required={campo.requerido}
-                            onChange={handleChange}
-                        />
-                    ) : campo.tipo === "checkbox" ? (
-                        <input
-                            type="checkbox"
-                            name={campo.nombre}
-                            onChange={handleChange}
-                            required={campo.requerido}
-                        />
-                    ) : (
-                        <input
-                            type={campo.tipo}
-                            name={campo.nombre}
-                            onChange={handleChange}
-                            required={campo.requerido}
-                        />
-                    )}
+        <div className={styles.root}>
+            <div className={styles.card}>
+                <div className={styles.title}>Contáctanos</div>
+                <div className={styles.subtitle}>Déjanos tu información y te responderemos a la brevedad.</div>
+
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    {campos.map((campo, i) => (
+                        <div key={i} className={styles.field}>
+                            {campo.tipo !== "checkbox" && (
+                                <label className={styles.label}>{campo.label}</label>
+                            )}
+
+                            {campo.tipo === "textarea" ? (
+                                <textarea
+                                    className={styles.textarea}
+                                    name={campo.nombre}
+                                    required={campo.requerido}
+                                    onChange={handleChange}
+                                    placeholder={`Escribe tu ${campo.label.toLowerCase()}...`}
+                                />
+                            ) : campo.tipo === "checkbox" ? (
+                                <label className={styles.checkboxWrap}>
+                                    <input
+                                        className={styles.checkbox}
+                                        type="checkbox"
+                                        name={campo.nombre}
+                                        onChange={handleChange}
+                                        required={campo.requerido}
+                                    />
+                                    <span className={styles.checkboxLabel}>{campo.label}</span>
+                                </label>
+                            ) : (
+                                <input
+                                    className={styles.input}
+                                    type={campo.tipo}
+                                    name={campo.nombre}
+                                    onChange={handleChange}
+                                    required={campo.requerido}
+                                    placeholder={`Tu ${campo.label.toLowerCase()}`}
+                                />
+                            )}
+                        </div>
+                    ))}
+                    <button className={styles.btn} type="submit">Enviar mensaje</button>
+                </form>
+
+                <div className={styles.footer}>
+                    Powered by{" "}
+                    <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer">
+                        Gibra Company
+                    </a>
                 </div>
-            ))}
-            <button type="submit">Enviar</button>
-        </form>
+            </div>
+        </div>
     );
 }
 
