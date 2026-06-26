@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { db } from "../../services/firebase";
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { toast } from "react-hot-toast";
+import styles from "./formularioClientes.module.css";
 
 function FormularioCliente() {
     const { id } = useParams(); // este es el ID del multilink
