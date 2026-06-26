@@ -21,7 +21,7 @@ function FormularioCliente() {
                 const data = snap.data();
                 setCampos(data.formulario_campos || []);
                 setMultilinkUrl(data.url); 
-                setOwnerUid(data.uid);
+                setOwnerUid(data.admin_uid);
             }
         };
         cargarFormulario();
