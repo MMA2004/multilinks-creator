@@ -84,3 +84,30 @@ footer a {
     font-weight: bold;
     text-decoration: none;
 }
+
+/* === Plantilla Minimalista === */
+.plantilla_minimalista .container { padding: 40px 20px; }
+.plantilla_minimalista h2 { font-size: 28px; letter-spacing: -0.5px; }
+.plantilla_minimalista .profile-pic { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.plantilla_minimalista .boton { border-radius: 8px !important; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+.plantilla_minimalista .boton:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+.plantilla_minimalista .guardar { border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+.plantilla_minimalista .guardar:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+
+/* === Plantilla Oscura === */
+.plantilla_oscura .container { padding: 40px 20px; }
+.plantilla_oscura h2 { font-size: 32px; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+.plantilla_oscura .profile-pic { box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+.plantilla_oscura .boton { border-radius: 12px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease; overflow: hidden; }
+.plantilla_oscura .boton:hover { transform: scale(1.03); box-shadow: 0 0 15px currentColor; }
+.plantilla_oscura .guardar { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease; }
+.plantilla_oscura .guardar:hover { transform: scale(1.05); box-shadow: 0 0 20px currentColor; }
+
+/* === Plantilla Glassmorphism === */
+.plantilla_glassmorphism .container { padding: 40px 20px; }
+.plantilla_glassmorphism h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.plantilla_glassmorphism .profile-pic { border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15); }
+.plantilla_glassmorphism .boton { border-radius: 20px !important; background: rgba(255, 255, 255, 0.15) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
+.plantilla_glassmorphism .boton:hover { transform: translateY(-3px); box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2); background: rgba(255, 255, 255, 0.25) !important; }
+.plantilla_glassmorphism .guardar { border-radius: 20px; background: rgba(255, 255, 255, 0.2) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
+.plantilla_glassmorphism .guardar:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.3) !important; box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2); }

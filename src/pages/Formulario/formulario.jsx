@@ -35,6 +35,7 @@ function Formulario() {
         correo: "",
         plantilla: "plantilla_comercial",
         fondo: "",
+        imagen_fondo: "",
         imagen: "",
         tamano_foto: "",
         color_titulo: "",
@@ -354,6 +355,14 @@ function Formulario() {
                                         onChange={handleChange}
                                     />
                                 </div>
+                            </div>
+
+                            <div className="mt-3">
+                                <label className={styles.label}>O subir imagen de fondo</label>
+                                <SubirImagen
+                                    urlInicial={formData.imagen_fondo}
+                                    onUploadSuccess={(url) => setFormData({ ...formData, imagen_fondo: url })}
+                                />
                             </div>
 
                             <hr className={styles.hr} />

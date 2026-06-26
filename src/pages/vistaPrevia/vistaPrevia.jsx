@@ -28,6 +28,8 @@ function VistaPrevia({ data }) {
         fuente_titulo = '',
         fuente_subtitulo = '',
         fuente_general = '',
+        plantilla = 'plantilla_comercial',
+        imagen_fondo = '',
     } = data;
 
     // Función para cargar fuentes web dinámicamente
@@ -55,10 +57,14 @@ function VistaPrevia({ data }) {
         cargarFuenteWeb(fuente_general);
     }, [fuente_titulo, fuente_subtitulo, fuente_general]);
 
+    const backgroundStyle = imagen_fondo 
+        ? { backgroundImage: `url(${imagen_fondo})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }
+        : { background: fondo };
+
     return (
         <div
-            className="vista-previa"
-            style={{ background: fondo }}
+            className={`vista-previa ${plantilla}`}
+            style={backgroundStyle}
         >
             <div className="container">
                 {imagen && <img src={imagen} alt="Foto de perfil" className="profile-pic" style={{ width: tamano_foto, borderRadius: borde }} />}
@@ -125,11 +131,14 @@ function VistaPrevia({ data }) {
                                     marginBottom: '15px', 
                                     borderRadius: `${boton.borde_grosor || 0}px`, 
                                     overflow: 'hidden', 
-                                    border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}`
+                                    border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}`,
+                                    width: `${boton.ancho_video || 100}%`,
+                                    margin: '0 auto 15px auto',
+                                    aspectRatio: '16/9'
                                 }}>
                                     <iframe 
                                         width="100%" 
-                                        height="215" 
+                                        height="100%" 
                                         src={yt_url} 
                                         title="YouTube video player" 
                                         frameBorder="0" 
@@ -147,6 +156,23 @@ function VistaPrevia({ data }) {
                                     textAlign: boton.alineacion || 'center', 
                                     color: boton.text_color || '#000', 
                                     fontSize: boton.tamano || '16px',
+                                    fontFamily: fuente_general
+                                }}>
+                                    {boton.texto}
+                                </div>
+                            );
+                        }
+
+                        if (tipoActual === "seccion") {
+                            return (
+                                <div key={index} style={{
+                                    marginBottom: '15px',
+                                    textAlign: 'left',
+                                    color: boton.text_color || '#ffffff',
+                                    fontSize: '18px',
+                                    fontWeight: 'bold',
+                                    borderBottom: `2px solid ${boton.borde_color || '#ffffff'}`,
+                                    paddingBottom: '5px',
                                     fontFamily: fuente_general
                                 }}>
                                     {boton.texto}

@@ -32,7 +32,8 @@ function EditorBotones({ botones, setBotones }) {
         icon_color: "#3aabd4",
         borde_color: "#ffffff",
         borde_grosor: "0",
-        tipo: "normal", // <— nuevo
+        ancho_video: "100",
+        tipo: "normal",
     });
 
     useEffect(() => {
@@ -122,6 +123,7 @@ function EditorBotones({ botones, setBotones }) {
             url: "",
             texto: "",
             icono: "",
+            ancho_video: "100",
             tipo: "normal",
             bg_color: localStorage.getItem("ultimo_bg_color") || "#ffffff",
             text_color: localStorage.getItem("ultimo_text_color") || "#3aabd4",
@@ -166,6 +168,7 @@ function EditorBotones({ botones, setBotones }) {
                                     <span className={styles.itemtitle}>
                                         {tipoActual === "youtube" ? "Video YouTube" : 
                                          tipoActual === "texto" ? "Bloque de Texto" :
+                                         tipoActual === "seccion" ? "Sección / Título" :
                                          tipoActual === "imagen" ? "Bloque de Imagen" :
                                          (b.texto || "Sin texto")}
                                     </span>
@@ -186,6 +189,7 @@ function EditorBotones({ botones, setBotones }) {
                                         <option value="correo">Botón Correo</option>
                                         <option value="youtube">Video YouTube</option>
                                         <option value="texto">Bloque de Texto</option>
+                                        <option value="seccion">Sección / Título</option>
                                         <option value="imagen">Imagen</option>
                                         {b.tipo === "ResFormulario" && (
                                             <option value="ResFormulario">ResFormulario</option>
@@ -193,7 +197,7 @@ function EditorBotones({ botones, setBotones }) {
                                     </select>
                                 </div>
 
-                                {["normal", "whatsapp", "correo", "ResFormulario", "texto"].includes(tipoActual) && (
+                                {["normal", "whatsapp", "correo", "ResFormulario", "texto", "seccion"].includes(tipoActual) && (
                                     <div className="mb-3">
                                         <label className={styles.label}>Texto</label>
                                         {tipoActual === "texto" ? (
@@ -276,7 +280,7 @@ function EditorBotones({ botones, setBotones }) {
                                     </div>
                                 )}
 
-                                {["normal", "whatsapp", "correo", "ResFormulario", "texto"].includes(tipoActual) && (
+                                {["normal", "whatsapp", "correo", "ResFormulario", "texto", "seccion"].includes(tipoActual) && (
                                     <div className="row g-2">
                                         {["normal", "whatsapp", "correo", "ResFormulario"].includes(tipoActual) && (
                                             <div className="col">
@@ -286,6 +290,17 @@ function EditorBotones({ botones, setBotones }) {
                                                     className={styles.color}
                                                     value={b.bg_color}
                                                     onChange={(e) => handleBotonEdit(i, "bg_color", e.target.value)}
+                                                />
+                                            </div>
+                                        )}
+                                        {tipoActual === "seccion" && (
+                                            <div className="col">
+                                                <label className={styles.label}>Color de la línea</label>
+                                                <input
+                                                    type="color"
+                                                    className={styles.color}
+                                                    value={b.borde_color}
+                                                    onChange={(e) => handleBotonEdit(i, "borde_color", e.target.value)}
                                                 />
                                             </div>
                                         )}
@@ -323,6 +338,19 @@ function EditorBotones({ botones, setBotones }) {
                                                 onChange={(e) => handleBotonEdit(i, "borde_color", e.target.value)}
                                             />
                                         </div>
+                                        {tipoActual === "youtube" && (
+                                            <div className="col">
+                                                <label className={styles.label}>Ancho Video (%)</label>
+                                                <input
+                                                    className={styles.input}
+                                                    type="number"
+                                                    min="10"
+                                                    max="100"
+                                                    value={b.ancho_video || "100"}
+                                                    onChange={(e) => handleBotonEdit(i, "ancho_video", e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                         <div className="col">
                                             <label className={styles.label}>Grosor del borde/radio (px)</label>
                                             <input
@@ -383,11 +411,12 @@ function EditorBotones({ botones, setBotones }) {
                     <option value="correo">Botón Correo</option>
                     <option value="youtube">Video YouTube</option>
                     <option value="texto">Bloque de Texto</option>
+                    <option value="seccion">Sección / Título</option>
                     <option value="imagen">Imagen</option>
                 </select>
             </div>
 
-            {["normal", "whatsapp", "correo", "texto"].includes(nuevoBoton.tipo) && (
+            {["normal", "whatsapp", "correo", "texto", "seccion"].includes(nuevoBoton.tipo) && (
                 <div className="mb-2">
                     <label className={styles.label}>Texto</label>
                     {nuevoBoton.tipo === "texto" ? (
@@ -477,7 +506,7 @@ function EditorBotones({ botones, setBotones }) {
                 </div>
             )}
 
-            {["normal", "whatsapp", "correo", "texto"].includes(nuevoBoton.tipo) && (
+            {["normal", "whatsapp", "correo", "texto", "seccion"].includes(nuevoBoton.tipo) && (
                 <div className="row g-2 mt-2">
                     {["normal", "whatsapp", "correo"].includes(nuevoBoton.tipo) && (
                         <div className="col">
@@ -487,6 +516,18 @@ function EditorBotones({ botones, setBotones }) {
                                 name="bg_color"
                                 className={styles.color}
                                 value={nuevoBoton.bg_color}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    )}
+                    {nuevoBoton.tipo === "seccion" && (
+                        <div className="col">
+                            <label className={styles.label}>Color de la línea</label>
+                            <input
+                                type="color"
+                                name="borde_color"
+                                className={styles.color}
+                                value={nuevoBoton.borde_color}
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -528,6 +569,20 @@ function EditorBotones({ botones, setBotones }) {
                             onChange={handleInputChange}
                         />
                     </div>
+                    {nuevoBoton.tipo === "youtube" && (
+                        <div className="col">
+                            <label className={styles.label}>Ancho Video (%)</label>
+                            <input
+                                className={styles.input}
+                                type="number"
+                                name="ancho_video"
+                                min="10"
+                                max="100"
+                                value={nuevoBoton.ancho_video || "100"}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    )}
                     <div className="col">
                         <label className={styles.label}>Grosor del borde (px)</label>
                         <input
