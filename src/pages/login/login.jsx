@@ -2,26 +2,26 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../../services/firebase.js";
+import { toast } from "react-hot-toast";
 import styles from "./Login.module.css";
 
 export default function Login() {
     const [correo, setCorreo] = useState("");
     const [clave, setClave] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPwd, setShowPwd] = useState(false);
     const navigate = useNavigate();
 
     const iniciarSesion = async (e) => {
         e.preventDefault();
-        setError("");
         setLoading(true);
         try {
             await signInWithEmailAndPassword(auth, correo.trim(), clave);
+            toast.success("¡Bienvenido!");
             navigate("/panel");
         } catch (err) {
             console.error(err);
-            setError("Correo o contraseña incorrectos");
+            toast.error("Correo o contraseña incorrectos");
         } finally {
             setLoading(false);
         }
@@ -39,12 +39,6 @@ export default function Login() {
                         </div>
                     </div>
                 </div>
-
-                {error && (
-                    <div className={styles.error} role="alert">
-                        {error}
-                    </div>
-                )}
 
                 <form onSubmit={iniciarSesion} className={styles.form}>
                     <div className={styles.field}>

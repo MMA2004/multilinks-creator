@@ -8,6 +8,7 @@ import { useAdmin } from "../../hooks/useAdmin.js";
 import { eliminarCarpetaMultilink } from "../../services/eliminarMultilink.js";
 import { extraerPathDesdeURL } from "../../utils/storagePaths.js";
 import { getSuspensionStatus, setSuspension } from "../../services/suspension.js";
+import { toast } from "react-hot-toast";
 import styles from "./MisMultilinks.module.css";
 
 export default function MisMultilinks() {
@@ -87,10 +88,10 @@ export default function MisMultilinks() {
     const copy = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
-            alert("Enlace copiado al portapapeles");
+            toast.success("Enlace copiado al portapapeles");
         } catch (e) {
             console.error(e);
-            alert("No se pudo copiar el enlace");
+            toast.error("No se pudo copiar el enlace");
         }
     };
 
@@ -111,7 +112,7 @@ export default function MisMultilinks() {
         } catch {
             // revertir si falló
             setSuspendedMap((prev) => ({ ...prev, [slug]: !prev[slug] }));
-            alert("No se pudo cambiar el estado de suspensión.");
+            toast.error("No se pudo cambiar el estado de suspensión.");
         } finally {
             setItemLoading((prev) => ({ ...prev, [slug]: false }));
         }
@@ -131,7 +132,7 @@ export default function MisMultilinks() {
 
     async function handleDelete(m) {
         if (!isAdmin) {
-            alert("Solo los administradores pueden eliminar multilinks.");
+            toast.error("Solo los administradores pueden eliminar multilinks.");
             return;
         }
         if (
@@ -154,10 +155,10 @@ export default function MisMultilinks() {
 
             // 4) Refrescar UI
             setMultilinks((prev) => prev.filter((x) => x.id !== m.id));
-            alert("Eliminado correctamente.");
+            toast.success("Eliminado correctamente.");
         } catch (e) {
             console.error(e);
-            alert(`No se pudo eliminar: ${e?.message || e}`);
+            toast.error(`No se pudo eliminar: ${e?.message || e}`);
         } finally {
             setDeletingId(null);
         }

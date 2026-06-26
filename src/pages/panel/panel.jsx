@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useAdmin } from "../../hooks/useAdmin.js";
+import { auth } from "../../services/firebase.js";
+import { signOut } from "firebase/auth";
 import styles from "./panel.module.css";
 
 export default function Panel() {
@@ -9,6 +11,15 @@ export default function Panel() {
     const isAdmin = useAdmin();
 
     if (!usuario) return null;
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+            navigate("/login");
+        } catch (error) {
+            console.error("Error al cerrar sesión", error);
+        }
+    };
 
     const accionesAdmin = [
         {
@@ -70,6 +81,10 @@ export default function Panel() {
                             </div>
                         </div>
                     </div>
+                    <button onClick={handleSignOut} className={styles.btnGlass} style={{ width: "auto", padding: "8px 16px", minHeight: "auto", fontSize: "14px" }}>
+                        <i className="bi bi-box-arrow-right"></i>
+                        Cerrar sesión
+                    </button>
                 </div>
 
                 <div className={styles.grid}>

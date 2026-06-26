@@ -2,26 +2,26 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../../services/firebase.js";
+import { toast } from "react-hot-toast";
 import styles from "./Registro.module.css";
 
 export default function Registro() {
     const [correo, setCorreo] = useState("");
     const [clave, setClave] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPwd, setShowPwd] = useState(false);
     const navigate = useNavigate();
 
     const registrarUsuario = async (e) => {
         e.preventDefault();
-        setError("");
         setLoading(true);
         try {
             await createUserWithEmailAndPassword(auth, correo.trim(), clave);
+            toast.success("¡Cuenta creada con éxito!");
             navigate("/panel");
         } catch (err) {
             console.error(err);
-            setError("Error al registrar el usuario");
+            toast.error("Error al registrar el usuario");
         } finally {
             setLoading(false);
         }
@@ -39,12 +39,6 @@ export default function Registro() {
                         </div>
                     </div>
                 </div>
-
-                {error && (
-                    <div className={styles.error} role="alert">
-                        {error}
-                    </div>
-                )}
 
                 <form onSubmit={registrarUsuario} className={styles.form}>
                     <div className={styles.field}>

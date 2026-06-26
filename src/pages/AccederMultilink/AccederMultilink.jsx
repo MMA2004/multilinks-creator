@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebase.js";
+import { toast } from "react-hot-toast";
 import styles from "./AccederMultilink.module.css";
 
 export default function AccederMultilink() {
     const [url, setUrl] = useState("");
     const [clave, setClave] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPwd, setShowPwd] = useState(false);
     const navigate = useNavigate();
@@ -16,7 +16,6 @@ export default function AccederMultilink() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
         setLoading(true);
 
         const slug = normalizarUrl(url);
@@ -30,13 +29,14 @@ export default function AccederMultilink() {
 
             if (!snap.empty) {
                 const docId = snap.docs[0].id;
+                toast.success("¡Acceso concedido!");
                 navigate(`/editar/${docId}`);
             } else {
-                setError("URL o clave incorrecta.");
+                toast.error("URL o clave incorrecta.");
             }
         } catch (e) {
             console.error(e);
-            setError("Error buscando el multilink.");
+            toast.error("Error buscando el multilink.");
         } finally {
             setLoading(false);
         }
@@ -56,12 +56,6 @@ export default function AccederMultilink() {
                     <div className={styles.title}>Editar tu Multilink</div>
                     <div />
                 </div>
-
-                {error && (
-                    <div className={`${styles.alert} ${styles.error}`} role="alert">
-                        {error}
-                    </div>
-                )}
 
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div className={styles.field}>

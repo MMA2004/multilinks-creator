@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"; // ⬅️ usa navigate
+import { toast } from "react-hot-toast";
 import VistaPrevia from "../vistaPrevia/vistaPrevia.jsx";
 import { Accordion } from "react-bootstrap";
 import EditorBotones from "../../components/editorBotones/editorBotones.jsx";
@@ -141,10 +142,10 @@ function Formulario() {
             await guardarMultilinkEnFirebase(id, formData);
             await generarMultilink(formData);
             setLastSaved(JSON.stringify(formData)); // ⬅️ ahora ya no está “dirty”
-            alert("Multilink actualizado correctamente.");
+            toast.success("Multilink actualizado correctamente.");
         } catch (error) {
             console.error("Error al guardar y generar:", error);
-            alert("Error al guardar o generar el multilink.");
+            toast.error("Error al guardar o generar el multilink.");
         }
     };
 

@@ -4,14 +4,13 @@ import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../../services/firebase.js";
 import { useAdmin } from "../../hooks/useAdmin.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { toast } from "react-hot-toast";
 import styles from "./crearMultilink.module.css";
 
 export default function CrearMultilink() {
     const [url, setUrl] = useState("");
     const [clave, setClave] = useState("");
     const [formularioActivado, setFormularioActivado] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPwd, setShowPwd] = useState(false);
     const [maxMiembros, setMaxMiembros] = useState(1);
@@ -26,22 +25,18 @@ export default function CrearMultilink() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
-        setSuccess("");
 
         const urlNorm = normalizarUrl(url);
         if (!urlNorm || !clave) {
-            setError("Por favor llena todos los campos.");
+            toast.error("Por favor llena todos los campos.");
             return;
         }
         if (!slugValido(urlNorm)) {
-            setError(
-                "La URL debe ser un slug válido (a–z, 0–9 y guiones, 2–63 caracteres, sin guion al inicio/fin)."
-            );
+            toast.error("La URL debe ser un slug válido (a–z, 0–9 y guiones, 2–63 caracteres, sin guion al inicio/fin).");
             return;
         }
         if (!usuario?.uid) {
-            setError("No hay sesión activa.");
+            toast.error("No hay sesión activa.");
             return;
         }
 
@@ -51,7 +46,7 @@ export default function CrearMultilink() {
             const qy = query(collection(db, "multilinks"), where("url", "==", urlNorm));
             const snap = await getDocs(qy);
             if (!snap.empty) {
-                setError("Ya existe un multilink con esa URL.");
+                toast.error("Ya existe un multilink con esa URL.");
                 return;
             }
 
@@ -106,11 +101,11 @@ export default function CrearMultilink() {
                 miembros: [usuario.uid],
             });
 
-            setSuccess("Multilink creado exitosamente.");
+            toast.success("Multilink creado exitosamente.");
             navigate(`/editar/${docRef.id}`);
         } catch (e) {
             console.error(e);
-            setError("Error al crear el multilink.");
+            toast.error("Error al crear el multilink.");
         } finally {
             setLoading(false);
         }
@@ -164,17 +159,6 @@ export default function CrearMultilink() {
                     <div className={styles.title}>Crear nuevo Multilink</div>
                     <div />
                 </div>
-
-                {error && (
-                    <div className={`${styles.alert} ${styles.error}`} role="alert">
-                        {error}
-                    </div>
-                )}
-                {success && (
-                    <div className={`${styles.alert} ${styles.success}`} role="status">
-                        {success}
-                    </div>
-                )}
 
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div className={styles.field}>

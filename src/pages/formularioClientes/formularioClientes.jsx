@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { toast } from "react-hot-toast";
 import {enviarFormularioAlServidor} from "../../services/apiFormulario.js";
 
 function FormularioCliente() {
@@ -41,11 +42,12 @@ function FormularioCliente() {
         });
 
         try {
-            await enviarFormularioAlServidor(multilinkUrl, respuestasEtiquetadas); // usamos la URL
+            await enviarFormularioAlServidor(multilinkUrl, respuestasEtiquetadas);
+            toast.success("Enviado con éxito");
             setEnviado(true);
         } catch (err) {
             console.error(err);
-            alert("Error al enviar el Formulario. Intenta de nuevo.");
+            toast.error("Error al enviar el Formulario. Intenta de nuevo.");
         }
     };
 

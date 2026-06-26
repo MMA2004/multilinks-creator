@@ -14,26 +14,33 @@ import ResFormulario from "./pages/ResFormulario/ResFormulario.jsx";
 import AdminTools from "./pages/tools/tools.jsx";
 import EstadisticasGlobales from "./pages/estadisticasGlobales/estadisticasGlobales.jsx";
 import OlvideClave from "./pages/OlvideClave/OlvideClave.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
     return (
         <Router>
+            <Toaster position="top-right" />
             <Routes>
                 <Route path="/" element={<Inicio />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
-                <Route path="/panel" element={<Panel />} />
-                <Route path="/editar/:id" element={<Formulario />} />
-                <Route path="/acceder" element={<AccederMultilink />} />
-                <Route path="/crear-multilink" element={<CrearMultilink />} />
-                <Route path="/registrar-multilink" element={<RegistrarMultilink />} />
-                <Route path="/mis-multilinks" element={<MisMultilinks />} />
-                <Route path="/estadisticas/:url" element={<Estadisticas />} />
-                <Route path="/formulario/:id" element={<FormularioCliente />} />
-                <Route path="/respuestas/:url" element={<ResFormulario />} />
-                <Route path="/admin-tools" element={<AdminTools />} />
-                <Route path="/estadisticas-globales" element={<EstadisticasGlobales />} />
                 <Route path="/olvide-clave" element={<OlvideClave />} />
+
+                {/* Rutas Protegidas */}
+                <Route path="/panel" element={<ProtectedRoute><Panel /></ProtectedRoute>} />
+                <Route path="/editar/:id" element={<ProtectedRoute><Formulario /></ProtectedRoute>} />
+                <Route path="/crear-multilink" element={<ProtectedRoute><CrearMultilink /></ProtectedRoute>} />
+                <Route path="/registrar-multilink" element={<ProtectedRoute><RegistrarMultilink /></ProtectedRoute>} />
+                <Route path="/mis-multilinks" element={<ProtectedRoute><MisMultilinks /></ProtectedRoute>} />
+                <Route path="/estadisticas/:url" element={<ProtectedRoute><Estadisticas /></ProtectedRoute>} />
+                <Route path="/estadisticas-globales" element={<ProtectedRoute><EstadisticasGlobales /></ProtectedRoute>} />
+                <Route path="/admin-tools" element={<ProtectedRoute><AdminTools /></ProtectedRoute>} />
+
+                {/* Rutas Públicas (acceso por clave o enlace) */}
+                <Route path="/acceder" element={<AccederMultilink />} />
+                <Route path="/formulario/:id" element={<FormularioCliente />} />
+                <Route path="/respuestas/:url" element={<ProtectedRoute><ResFormulario /></ProtectedRoute>} />
             </Routes>
         </Router>
     );
