@@ -33,6 +33,7 @@ function Formulario() {
         borde: "",
         telefono: "",
         correo: "",
+        plantilla: "plantilla_comercial",
         fondo: "",
         imagen: "",
         tamano_foto: "",
@@ -209,6 +210,21 @@ function Formulario() {
                                     value={formData.titulo_pagina}
                                     onChange={handleChange}
                                 />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className={styles.label}>Diseño de Plantilla</label>
+                                <select
+                                    className={styles.input}
+                                    name="plantilla"
+                                    value={formData.plantilla || "plantilla_comercial"}
+                                    onChange={handleChange}
+                                >
+                                    <option value="plantilla_comercial">Comercial (Clásica)</option>
+                                    <option value="plantilla_minimalista">Minimalista</option>
+                                    <option value="plantilla_oscura">Oscura Neón</option>
+                                    <option value="plantilla_glassmorphism">Glassmorphism (Cristal)</option>
+                                </select>
                             </div>
 
                             <hr className={styles.hr} />

@@ -86,25 +86,98 @@ function VistaPrevia({ data }) {
                 </h3>
 
                 <div className="social-buttons">
-                    {botones.map((boton, index) => (
-                        <div
-                            key={index}
-                            className="boton"
-                            onClick={() => window.open(boton.url, '_blank')}
-                            style={{
-                                backgroundColor: boton.bg_color || 'white',
-                                color: boton.text_color,
-                                border: `${boton.borde_grosor}px solid ${boton.borde_color}`,
-                                fontFamily: fuente_general
-                            }}
-                        >
-                            <i
-                                className={`bi ${boton.icono}`}
-                                style={{ color: boton.icon_color}}
-                            ></i>
-                            <span>{boton.texto}</span>
-                        </div>
-                    ))}
+                    {botones.map((boton, index) => {
+                        const tipoActual = boton.tipo || "enlace";
+                        
+                        // Mapear tipos antiguos a "enlace"
+                        const esBotonClasico = ["enlace", "normal", "whatsapp", "correo", "ResFormulario", ""].includes(tipoActual);
+
+                        if (esBotonClasico) {
+                            return (
+                                <div
+                                    key={index}
+                                    className="boton"
+                                    onClick={() => window.open(boton.url, '_blank')}
+                                    style={{
+                                        backgroundColor: boton.bg_color || 'white',
+                                        color: boton.text_color,
+                                        border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || '#000'}`,
+                                        fontFamily: fuente_general,
+                                        marginBottom: '15px'
+                                    }}
+                                >
+                                    <i
+                                        className={`bi ${boton.icono}`}
+                                        style={{ color: boton.icon_color}}
+                                    ></i>
+                                    <span>{boton.texto}</span>
+                                </div>
+                            );
+                        }
+
+                        if (tipoActual === "youtube") {
+                            let yt_url = boton.url || "";
+                            if (yt_url.includes("watch?v=")) yt_url = yt_url.replace("watch?v=", "embed/");
+                            else if (yt_url.includes("youtu.be/")) yt_url = yt_url.replace("youtu.be/", "youtube.com/embed/");
+
+                            return (
+                                <div key={index} style={{
+                                    marginBottom: '15px', 
+                                    borderRadius: `${boton.borde_grosor || 0}px`, 
+                                    overflow: 'hidden', 
+                                    border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}`
+                                }}>
+                                    <iframe 
+                                        width="100%" 
+                                        height="215" 
+                                        src={yt_url} 
+                                        title="YouTube video player" 
+                                        frameBorder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowFullScreen
+                                    ></iframe>
+                                </div>
+                            );
+                        }
+
+                        if (tipoActual === "texto") {
+                            return (
+                                <div key={index} style={{
+                                    marginBottom: '15px', 
+                                    textAlign: boton.alineacion || 'center', 
+                                    color: boton.text_color || '#000', 
+                                    fontSize: boton.tamano || '16px',
+                                    fontFamily: fuente_general
+                                }}>
+                                    {boton.texto}
+                                </div>
+                            );
+                        }
+
+                        if (tipoActual === "imagen") {
+                            return (
+                                <div key={index} style={{ marginBottom: '15px', textAlign: 'center' }}>
+                                    {boton.url ? (
+                                        <img 
+                                            src={boton.url} 
+                                            alt="Bloque de imagen" 
+                                            style={{ 
+                                                maxWidth: '100%', 
+                                                borderRadius: `${boton.borde_grosor || 0}px`, 
+                                                border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}` 
+                                            }} 
+                                        />
+                                    ) : (
+                                        <div style={{ padding: '20px', background: '#f0f0f0', border: '1px dashed #ccc', borderRadius: `${boton.borde_grosor || 0}px` }}>
+                                            <em>Sin imagen seleccionada</em>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        return null;
+                    })}
                 </div>
 
                 {mostrar_boton_contacto && (
