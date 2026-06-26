@@ -30,7 +30,7 @@ export default function ResFormulario() {
                     q = query(
                         collection(db, "respuestas_formulario"), 
                         where("multilink_url", "==", url),
-                        where("owner_uid", "==", usuario.uid)
+                        where("miembros", "array-contains", usuario.uid)
                     );
                 }
 
