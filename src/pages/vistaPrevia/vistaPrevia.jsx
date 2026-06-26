@@ -150,6 +150,52 @@ function VistaPrevia({ data }) {
                             );
                         }
 
+                        if (tipoActual === "mapa") {
+                            // Extraer el enlace src si el usuario pegó el iframe completo por error
+                            let map_url = boton.url || "";
+                            if (map_url.includes("<iframe")) {
+                                const match = map_url.match(/src="([^"]+)"/);
+                                if (match) map_url = match[1];
+                            }
+                            
+                            const isGoogleMaps = map_url.includes("google.com/maps");
+                            const isEmbed = map_url.includes("embed") || map_url.includes("pb=");
+                            const isInvalidMap = isGoogleMaps && !isEmbed;
+
+                            return (
+                                <div key={index} style={{
+                                    marginBottom: '15px',
+                                    borderRadius: `${boton.borde_grosor || 0}px`,
+                                    overflow: 'hidden',
+                                    border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}`,
+                                    width: `${boton.ancho_video || 100}%`,
+                                    height: `${boton.alto_mapa || 300}px`,
+                                    margin: '0 auto 15px auto'
+                                }}>
+                                    {map_url && !isInvalidMap ? (
+                                        <iframe
+                                            width="100%"
+                                            height="100%"
+                                            src={map_url}
+                                            style={{ border: 0 }}
+                                            allowFullScreen=""
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                        ></iframe>
+                                    ) : (
+                                        <div style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f0f0f0', color: '#666', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                            <i className="bi bi-geo-alt" style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}></i>
+                                            {isInvalidMap ? (
+                                                <span style={{ fontSize: '13px', color: '#d9534f' }}>Enlace incorrecto. En Google Maps ve a <b>Compartir</b> y elige <b>Insertar un mapa</b>.</span>
+                                            ) : (
+                                                <span style={{ fontSize: '13px' }}>Añade la URL de inserción del mapa</span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
                         if (tipoActual === "texto") {
                             return (
                                 <div key={index} style={{

@@ -60,6 +60,7 @@ function EditorBotones({ botones, setBotones }) {
         let iconoPredefinido = "bi-link-45deg";
         
         if (tipo === "youtube") { textoPredefinido = "Video de YouTube"; iconoPredefinido = "bi-youtube"; }
+        if (tipo === "mapa") { textoPredefinido = "Mapa de Google"; iconoPredefinido = "bi-geo-alt"; }
         if (tipo === "texto") { textoPredefinido = "Bloque de texto"; iconoPredefinido = "bi-text-paragraph"; }
         if (tipo === "seccion") { textoPredefinido = "Nueva Sección"; iconoPredefinido = "bi-hr"; }
         if (tipo === "imagen") { textoPredefinido = ""; iconoPredefinido = "bi-image"; }
@@ -106,6 +107,7 @@ function EditorBotones({ botones, setBotones }) {
     const placeholderPorTipo = (tipo) => {
         if (tipo === "whatsapp") return "https://wa.me/ + tu número (solo números sin +)";
         if (tipo === "correo") return "mailto: + tu correo";
+        if (tipo === "mapa") return "https://www.google.com/maps/embed?...";
         return "URL completa (https://...)";
     };
 
@@ -129,6 +131,10 @@ function EditorBotones({ botones, setBotones }) {
                 <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("youtube")}>
                     <i className="bi bi-youtube" />
                     <span>YouTube</span>
+                </div>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("mapa")}>
+                    <i className="bi bi-geo-alt" />
+                    <span>Ubicación</span>
                 </div>
                 <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("texto")}>
                     <i className="bi bi-text-paragraph" />
@@ -157,6 +163,7 @@ function EditorBotones({ botones, setBotones }) {
                                     <span className={styles.badge}>#{i + 1}</span>
                                     <span className={styles.itemtitle}>
                                         {tipoActual === "youtube" ? "Video YouTube" : 
+                                         tipoActual === "mapa" ? "Mapa de Ubicación" : 
                                          tipoActual === "texto" ? "Bloque de Texto" :
                                          tipoActual === "seccion" ? "Sección / Título" :
                                          tipoActual === "imagen" ? "Bloque de Imagen" :
@@ -180,6 +187,7 @@ function EditorBotones({ botones, setBotones }) {
                                         <option value="whatsapp">Botón WhatsApp</option>
                                         <option value="correo">Botón Correo</option>
                                         <option value="youtube">Video YouTube</option>
+                                        <option value="mapa">Mapa de Ubicación</option>
                                         <option value="texto">Bloque de Texto</option>
                                         <option value="seccion">Sección / Título</option>
                                         <option value="imagen">Imagen</option>
@@ -202,19 +210,19 @@ function EditorBotones({ botones, setBotones }) {
                                         ) : (
                                             <input
                                                 className={styles.input}
-                                                value={b.texto}
+                                                value={b.texto || ""}
                                                 onChange={(e) => handleBotonEdit(i, "texto", e.target.value)}
                                             />
                                         )}
                                     </div>
                                 )}
 
-                                {["normal", "whatsapp", "correo", "youtube", "ResFormulario"].includes(tipoActual) && (
+                                {["normal", "whatsapp", "correo", "youtube", "mapa", "ResFormulario"].includes(tipoActual) && (
                                     <div className="mb-3">
-                                        <label className={styles.label}>URL {tipoActual === "youtube" ? "del Video" : ""}</label>
+                                        <label className={styles.label}>URL {tipoActual === "youtube" ? "del Video" : tipoActual === "mapa" ? "del Mapa Embed" : ""}</label>
                                         <input
                                             className={styles.input}
-                                            value={b.url}
+                                            value={b.url || ""}
                                             placeholder={
                                                 tipoActual === "youtube" ? "https://www.youtube.com/watch?v=..." :
                                                 placeholderPorTipo(tipoActual)
@@ -341,7 +349,7 @@ function EditorBotones({ botones, setBotones }) {
                                     </div>
                                 )}
 
-                                {["normal", "whatsapp", "correo", "youtube", "imagen", "ResFormulario"].includes(tipoActual) && (
+                                {["normal", "whatsapp", "correo", "youtube", "imagen", "mapa", "ResFormulario"].includes(tipoActual) && (
                                     <div className="row g-2 mt-2">
                                         <div className="col">
                                             <label className={styles.label}>Color del borde</label>
@@ -352,9 +360,9 @@ function EditorBotones({ botones, setBotones }) {
                                                 onChange={(e) => handleBotonEdit(i, "borde_color", e.target.value)}
                                             />
                                         </div>
-                                        {tipoActual === "youtube" && (
+                                        {["youtube", "mapa"].includes(tipoActual) && (
                                             <div className="col">
-                                                <label className={styles.label}>Ancho Video (%)</label>
+                                                <label className={styles.label}>Ancho (%)</label>
                                                 <input
                                                     className={styles.input}
                                                     type="number"
@@ -362,6 +370,19 @@ function EditorBotones({ botones, setBotones }) {
                                                     max="100"
                                                     value={b.ancho_video || "100"}
                                                     onChange={(e) => handleBotonEdit(i, "ancho_video", e.target.value)}
+                                                />
+                                            </div>
+                                        )}
+                                        {tipoActual === "mapa" && (
+                                            <div className="col">
+                                                <label className={styles.label}>Alto (px)</label>
+                                                <input
+                                                    className={styles.input}
+                                                    type="number"
+                                                    min="100"
+                                                    max="800"
+                                                    value={b.alto_mapa || "300"}
+                                                    onChange={(e) => handleBotonEdit(i, "alto_mapa", e.target.value)}
                                                 />
                                             </div>
                                         )}
