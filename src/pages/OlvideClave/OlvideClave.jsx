@@ -17,10 +17,18 @@ export default function OlvideClave() {
         setLoading(true);
         try {
             await sendPasswordResetEmail(auth, correo.trim());
-            setMensaje("Te hemos enviado un correo para restablecer tu contraseña.");
+            setMensaje("Te hemos enviado un correo para restablecer tu contraseña. Recuerda revisar tu bandeja de SPAM.");
         } catch (err) {
-            console.error(err);
-            setError("Hubo un problema. Verifica tu correo e inténtalo nuevamente.");
+            console.error("Error al enviar correo de recuperación:", err);
+            if (err.code === "auth/user-not-found") {
+                setError("No existe una cuenta registrada con este correo.");
+            } else if (err.code === "auth/invalid-email") {
+                setError("El correo electrónico ingresado no es válido.");
+            } else if (err.code === "auth/too-many-requests") {
+                setError("Has realizado demasiados intentos. Por favor, espera un momento y vuelve a intentarlo.");
+            } else {
+                setError("Hubo un problema al enviar el correo. Por favor, intenta nuevamente.");
+            }
         } finally {
             setLoading(false);
         }

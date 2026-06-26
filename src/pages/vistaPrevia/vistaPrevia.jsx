@@ -57,8 +57,8 @@ function VistaPrevia({ data }) {
         cargarFuenteWeb(fuente_general);
     }, [fuente_titulo, fuente_subtitulo, fuente_general]);
 
-    const backgroundStyle = imagen_fondo 
-        ? { backgroundImage: `url(${imagen_fondo})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }
+    const backgroundStyle = imagen_fondo
+        ? { backgroundImage: `url(${imagen_fondo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { background: fondo };
 
     return (
@@ -94,15 +94,16 @@ function VistaPrevia({ data }) {
                 <div className="social-buttons">
                     {botones.map((boton, index) => {
                         const tipoActual = boton.tipo || "enlace";
-                        
+
                         // Mapear tipos antiguos a "enlace"
                         const esBotonClasico = ["enlace", "normal", "whatsapp", "correo", "ResFormulario", ""].includes(tipoActual);
 
                         if (esBotonClasico) {
+                            const isCircular = boton.forma === "circular";
                             return (
                                 <div
                                     key={index}
-                                    className="boton"
+                                    className={`boton ${isCircular ? 'boton-circular' : ''}`}
                                     onClick={() => window.open(boton.url, '_blank')}
                                     style={{
                                         backgroundColor: boton.bg_color || 'white',
@@ -114,9 +115,9 @@ function VistaPrevia({ data }) {
                                 >
                                     <i
                                         className={`bi ${boton.icono}`}
-                                        style={{ color: boton.icon_color}}
+                                        style={{ color: boton.icon_color }}
                                     ></i>
-                                    <span>{boton.texto}</span>
+                                    {!isCircular && <span>{boton.texto}</span>}
                                 </div>
                             );
                         }
@@ -128,21 +129,21 @@ function VistaPrevia({ data }) {
 
                             return (
                                 <div key={index} style={{
-                                    marginBottom: '15px', 
-                                    borderRadius: `${boton.borde_grosor || 0}px`, 
-                                    overflow: 'hidden', 
+                                    marginBottom: '15px',
+                                    borderRadius: `${boton.borde_grosor || 0}px`,
+                                    overflow: 'hidden',
                                     border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}`,
                                     width: `${boton.ancho_video || 100}%`,
                                     margin: '0 auto 15px auto',
                                     aspectRatio: '16/9'
                                 }}>
-                                    <iframe 
-                                        width="100%" 
-                                        height="100%" 
-                                        src={yt_url} 
-                                        title="YouTube video player" 
-                                        frameBorder="0" 
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    <iframe
+                                        width="100%"
+                                        height="100%"
+                                        src={yt_url}
+                                        title="YouTube video player"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
                                     ></iframe>
                                 </div>
@@ -152,9 +153,9 @@ function VistaPrevia({ data }) {
                         if (tipoActual === "texto") {
                             return (
                                 <div key={index} style={{
-                                    marginBottom: '15px', 
-                                    textAlign: boton.alineacion || 'center', 
-                                    color: boton.text_color || '#000', 
+                                    marginBottom: '15px',
+                                    textAlign: boton.alineacion || 'center',
+                                    color: boton.text_color || '#000',
                                     fontSize: boton.tamano || '16px',
                                     fontFamily: fuente_general
                                 }}>
@@ -184,14 +185,14 @@ function VistaPrevia({ data }) {
                             return (
                                 <div key={index} style={{ marginBottom: '15px', textAlign: 'center' }}>
                                     {boton.url ? (
-                                        <img 
-                                            src={boton.url} 
-                                            alt="Bloque de imagen" 
-                                            style={{ 
-                                                maxWidth: '100%', 
-                                                borderRadius: `${boton.borde_grosor || 0}px`, 
-                                                border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}` 
-                                            }} 
+                                        <img
+                                            src={boton.url}
+                                            alt="Bloque de imagen"
+                                            style={{
+                                                maxWidth: '100%',
+                                                borderRadius: `${boton.borde_grosor || 0}px`,
+                                                border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || 'transparent'}`
+                                            }}
                                         />
                                     ) : (
                                         <div style={{ padding: '20px', background: '#f0f0f0', border: '1px dashed #ccc', borderRadius: `${boton.borde_grosor || 0}px` }}>
@@ -207,15 +208,46 @@ function VistaPrevia({ data }) {
                 </div>
 
                 {mostrar_boton_contacto && (
-                    <a href="#" download>
-                        <button className="guardar" style={{ backgroundColor: contacto_bg, color: contacto_color, border: `${contacto_borde_grosor}px solid ${contacto_borde_color}`, fontFamily: fuente_general }}>
-                            Guardar Contacto
-                        </button>
-                    </a>
+                    <div style={{ textAlign: 'center', marginTop: '15px', marginBottom: '10px' }}>
+                        <a href="#" download style={{ textDecoration: 'none', display: 'inline-block' }}>
+                            <button
+                                className="guardar"
+                                style={{
+                                    backgroundColor: contacto_bg,
+                                    color: contacto_color,
+                                    border: `${contacto_borde_grosor}px solid ${contacto_borde_color}`,
+                                    fontFamily: fuente_general,
+                                    borderRadius: '30px',
+                                    padding: '10px 18px', // <- Bajamos de 25px a 18px para recortar los lados
+                                    fontSize: '16px',
+                                    margin: '0 auto',
+                                    cursor: 'pointer',
+                                    width: '200px'
+                                }}
+                            >
+                                Guardar Contacto
+                            </button>
+                        </a>
+                    </div>
                 )}
 
-                <footer style={{ color: color_footer, fontFamily: fuente_general }}>
-                    Powered by <a href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: color_footer, fontFamily: fuente_general }}>Gibra Company</a>
+                <footer style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '6px',               // Espacio ideal entre "Powered by" y "Gibra Company"
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: color_footer,
+                    fontFamily: fuente_general,
+                    fontSize: '14px',
+                    width: 'max-content',     // <- Cambiado de '100%' a 'max-content' (solo ocupa lo que mide el texto)
+                    margin: '0 auto',         // <- Centra el footer horizontalmente dentro de los 450px del .container
+                    fontWeight: 'bold'
+                }}>
+                    <span>Powered by</span>
+                    <a href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: color_footer, fontFamily: fuente_general, textDecoration: 'none', fontWeight: 'bold' }}>
+                        Gibra Company
+                    </a>
                 </footer>
             </div>
         </div>

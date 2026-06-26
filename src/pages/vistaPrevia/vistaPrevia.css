@@ -13,7 +13,15 @@ body, html {
     min-height: 100vh;
 }
 
-/* Contenido principal */
+/* Contenedor principal de la vista previa */
+.vista-previa {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Ajuste al padre, asumiendo que el iframe o contenedor padre limita la altura */
+    overflow: hidden; /* Oculta el scroll global para mantener el fondo estático */
+}
+
+/* Contenido principal que hace scroll */
 .container {
     flex: 1;
     padding: 20px;
@@ -21,6 +29,17 @@ body, html {
     max-width: 450px;
     width: 90%;
     margin: 0 auto;
+    height: 100%;
+    overflow-y: auto; /* Solo los botones hacen scroll */
+}
+
+/* Ocultar barra de scroll para estética limpia en la preview */
+.container::-webkit-scrollbar {
+    display: none;
+}
+.container {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 /* Títulos */
@@ -61,11 +80,27 @@ h3 {
     font-size: 30px;
 }
 
+/* Botones circulares (redes sociales) */
+.boton-circular {
+    width: 65px !important;
+    height: 65px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    margin: 10px 8px !important;
+    padding: 0 !important;
+}
+
+.boton-circular i {
+    position: static !important;
+    margin: 0 !important;
+    font-size: 30px;
+}
+
 /* Botón guardar contacto */
 .guardar {
     color: white;
     padding: 10px 20px;
-    font-size: 25px;
+    font-size: 18px;
     cursor: pointer;
     border: none;
     border-radius: 30px;
@@ -77,6 +112,8 @@ footer {
     text-align: center;
     padding: 15px;
     font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
 }
 
 footer a {
@@ -91,7 +128,7 @@ footer a {
 .plantilla_minimalista .profile-pic { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 .plantilla_minimalista .boton { border-radius: 8px !important; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: all 0.3s ease; }
 .plantilla_minimalista .boton:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
-.plantilla_minimalista .guardar { border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+.plantilla_minimalista .guardar { box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s ease; }
 .plantilla_minimalista .guardar:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
 
 /* === Plantilla Oscura === */
@@ -100,7 +137,7 @@ footer a {
 .plantilla_oscura .profile-pic { box-shadow: 0 0 20px rgba(255,255,255,0.1); }
 .plantilla_oscura .boton { border-radius: 12px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease; overflow: hidden; }
 .plantilla_oscura .boton:hover { transform: scale(1.03); box-shadow: 0 0 15px currentColor; }
-.plantilla_oscura .guardar { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease; }
+.plantilla_oscura .guardar { box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease; }
 .plantilla_oscura .guardar:hover { transform: scale(1.05); box-shadow: 0 0 20px currentColor; }
 
 /* === Plantilla Glassmorphism === */
@@ -109,5 +146,5 @@ footer a {
 .plantilla_glassmorphism .profile-pic { border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15); }
 .plantilla_glassmorphism .boton { border-radius: 20px !important; background: rgba(255, 255, 255, 0.15) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
 .plantilla_glassmorphism .boton:hover { transform: translateY(-3px); box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2); background: rgba(255, 255, 255, 0.25) !important; }
-.plantilla_glassmorphism .guardar { border-radius: 20px; background: rgba(255, 255, 255, 0.2) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
+.plantilla_glassmorphism .guardar { background: rgba(255, 255, 255, 0.2) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
 .plantilla_glassmorphism .guardar:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.3) !important; box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2); }

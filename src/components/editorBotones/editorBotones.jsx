@@ -23,51 +23,7 @@ function inferTipoFromUrl(u = "") {
 }
 
 function EditorBotones({ botones, setBotones }) {
-    const [nuevoBoton, setNuevoBoton] = useState({
-        url: "",
-        texto: "",
-        icono: "",
-        bg_color: "#ffffff",
-        text_color: "#3aabd4",
-        icon_color: "#3aabd4",
-        borde_color: "#ffffff",
-        borde_grosor: "0",
-        ancho_video: "100",
-        tipo: "normal",
-    });
-
-    useEffect(() => {
-        const bg_color = localStorage.getItem("ultimo_bg_color") || "#ffffff";
-        const text_color = localStorage.getItem("ultimo_text_color") || "#3aabd4";
-        const icon_color = localStorage.getItem("ultimo_icon_color") || "#3aabd4";
-        const borde_color = localStorage.getItem("ultimo_borde_color") || "#000000";
-        const borde_grosor = localStorage.getItem("ultimo_borde_grosor") || "0";
-        setNuevoBoton((prev) => ({
-            ...prev,
-            bg_color,
-            text_color,
-            icon_color,
-            borde_color,
-            borde_grosor,
-        }));
-    }, []);
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNuevoBoton((prev) => {
-            let next = { ...prev, [name]: value };
-            // si cambia el tipo, ajustamos la URL con el prefijo correcto
-            if (name === "tipo") {
-                next.url = ensurePrefix(value, prev.url);
-            }
-            return next;
-        });
-        if (
-            ["bg_color", "text_color", "icon_color", "borde_color", "borde_grosor"].includes(name)
-        ) {
-            localStorage.setItem(`ultimo_${name}`, value);
-        }
-    };
+    const [activeKeys, setActiveKeys] = useState(["0"]);
 
     const handleBotonEdit = (index, campo, valor) => {
         const nuevos = [...botones];
@@ -96,41 +52,41 @@ function EditorBotones({ botones, setBotones }) {
         setBotones(nuevos);
     };
 
-    const agregarBoton = () => {
+    const agregarBotonRapido = (tipo) => {
         const nuevos = [...botones];
         const indexResFormulario = nuevos.findIndex((b) => b.tipo === "ResFormulario");
+        
+        let textoPredefinido = "Nuevo Botón";
+        let iconoPredefinido = "bi-link-45deg";
+        
+        if (tipo === "youtube") { textoPredefinido = "Video de YouTube"; iconoPredefinido = "bi-youtube"; }
+        if (tipo === "texto") { textoPredefinido = "Bloque de texto"; iconoPredefinido = "bi-text-paragraph"; }
+        if (tipo === "seccion") { textoPredefinido = "Nueva Sección"; iconoPredefinido = "bi-hr"; }
+        if (tipo === "imagen") { textoPredefinido = ""; iconoPredefinido = "bi-image"; }
+        if (tipo === "whatsapp") { iconoPredefinido = "bi-whatsapp"; }
+        if (tipo === "correo") { iconoPredefinido = "bi-envelope"; }
+        
         const nuevo = {
-            ...nuevoBoton,
-            // persistimos últimos colores elegidos
-            bg_color: localStorage.getItem("ultimo_bg_color") || nuevoBoton.bg_color,
-            text_color: localStorage.getItem("ultimo_text_color") || nuevoBoton.text_color,
-            icon_color: localStorage.getItem("ultimo_icon_color") || nuevoBoton.icon_color,
-            borde_color: localStorage.getItem("ultimo_borde_color") || nuevoBoton.borde_color,
-            borde_grosor: localStorage.getItem("ultimo_borde_grosor") || nuevoBoton.borde_grosor,
-            // aseguramos URL con prefijo correcto según tipo
-            url:
-                nuevoBoton.tipo === "normal"
-                    ? stripKnownPrefixes(nuevoBoton.url)
-                    : ensurePrefix(nuevoBoton.tipo, nuevoBoton.url),
+            tipo,
+            texto: textoPredefinido,
+            url: "",
+            icono: iconoPredefinido,
+            ancho_video: "100",
+            forma: "rectangular",
+            bg_color: localStorage.getItem("ultimo_bg_color") || "#ffffff",
+            text_color: localStorage.getItem("ultimo_text_color") || "#3aabd4",
+            icon_color: localStorage.getItem("ultimo_icon_color") || "#3aabd4",
+            borde_color: localStorage.getItem("ultimo_borde_color") || "#000000",
+            borde_grosor: localStorage.getItem("ultimo_borde_grosor") || "0",
         };
 
         if (indexResFormulario !== -1) nuevos.splice(indexResFormulario, 0, nuevo);
         else nuevos.push(nuevo);
 
         setBotones(nuevos);
-        setNuevoBoton((prev) => ({
-            ...prev,
-            url: "",
-            texto: "",
-            icono: "",
-            ancho_video: "100",
-            tipo: "normal",
-            bg_color: localStorage.getItem("ultimo_bg_color") || "#ffffff",
-            text_color: localStorage.getItem("ultimo_text_color") || "#3aabd4",
-            icon_color: localStorage.getItem("ultimo_icon_color") || "#3aabd4",
-            borde_color: localStorage.getItem("ultimo_borde_color") || "#000000",
-            borde_grosor: localStorage.getItem("ultimo_borde_grosor") || "0",
-        }));
+        
+        const insertedIndex = indexResFormulario !== -1 ? indexResFormulario : nuevos.length - 1;
+        setActiveKeys((prev) => [...prev, insertedIndex.toString()]);
     };
 
     const moverBotonArriba = (index) => {
@@ -148,16 +104,50 @@ function EditorBotones({ botones, setBotones }) {
     };
 
     const placeholderPorTipo = (tipo) => {
-        if (tipo === "whatsapp") return "https://wa.me/ + tu número (solo números)";
+        if (tipo === "whatsapp") return "https://wa.me/ + tu número (solo números sin +)";
         if (tipo === "correo") return "mailto: + tu correo";
         return "URL completa (https://...)";
     };
 
     return (
         <div className={styles.root}>
-            <h3 className={styles.title}>Bloques / Botones</h3>
+            <h3 className={styles.title}>Añadir Bloques</h3>
+            
+            <div className={styles.quickAddGrid}>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("normal")}>
+                    <i className="bi bi-link-45deg" />
+                    <span>Enlace</span>
+                </div>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("whatsapp")}>
+                    <i className="bi bi-whatsapp" />
+                    <span>WhatsApp</span>
+                </div>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("correo")}>
+                    <i className="bi bi-envelope" />
+                    <span>Correo</span>
+                </div>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("youtube")}>
+                    <i className="bi bi-youtube" />
+                    <span>YouTube</span>
+                </div>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("texto")}>
+                    <i className="bi bi-text-paragraph" />
+                    <span>Texto</span>
+                </div>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("seccion")}>
+                    <i className="bi bi-hr" />
+                    <span>Sección</span>
+                </div>
+                <div className={styles.quickAddBtn} onClick={() => agregarBotonRapido("imagen")}>
+                    <i className="bi bi-image" />
+                    <span>Imagen</span>
+                </div>
+            </div>
 
-            <Accordion defaultActiveKey="0" alwaysOpen className={styles.acc}>
+            <hr className={styles.hr} />
+            <h3 className={styles.title}>Tus Bloques</h3>
+
+            <Accordion activeKey={activeKeys} onSelect={setActiveKeys} alwaysOpen className={styles.acc}>
                 {botones.map((b, i) => {
                     const tipoActual = b.tipo || inferTipoFromUrl(b.url);
                     return (
@@ -176,6 +166,8 @@ function EditorBotones({ botones, setBotones }) {
                             </Accordion.Header>
 
                             <Accordion.Body className={styles.body}>
+                                <div className={styles.sectionTitle}>Contenido</div>
+                                
                                 <div className="mb-3">
                                     <label className={styles.label}>Tipo de Bloque</label>
                                     <select
@@ -245,12 +237,34 @@ function EditorBotones({ botones, setBotones }) {
                                 )}
 
                                 {["normal", "whatsapp", "correo", "ResFormulario"].includes(tipoActual) && (
-                                    <div className="mb-3">
-                                        <label className={styles.label}>Icono</label>
-                                        <IconPicker
-                                            value={b.icono}
-                                            onChange={(val) => handleBotonEdit(i, "icono", val)}
-                                        />
+                                    <div className="row g-2 mb-3">
+                                        <div className="col">
+                                            <label className={styles.label}>Icono</label>
+                                            <IconPicker
+                                                value={b.icono}
+                                                onChange={(val) => handleBotonEdit(i, "icono", val)}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {["normal", "whatsapp", "correo", "texto", "seccion", "imagen", "youtube"].includes(tipoActual) && (
+                                    <div className={styles.sectionTitle}>Diseño y Estilo</div>
+                                )}
+                                
+                                {["normal", "whatsapp", "correo", "ResFormulario"].includes(tipoActual) && (
+                                    <div className="row g-2 mb-3">
+                                        <div className="col">
+                                            <label className={styles.label}>Forma del Botón</label>
+                                            <select
+                                                className={styles.input}
+                                                value={b.forma || "rectangular"}
+                                                onChange={(e) => handleBotonEdit(i, "forma", e.target.value)}
+                                            >
+                                                <option value="rectangular">Rectangular</option>
+                                                <option value="circular">Circular (Solo ícono)</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 )}
                                 
@@ -394,216 +408,8 @@ function EditorBotones({ botones, setBotones }) {
                     );
                 })}
             </Accordion>
-
-            <hr className={styles.hr} />
-            <h3 className={styles.title}>Agregar nuevo bloque</h3>
-
-            <div className="mb-2">
-                <label className={styles.label}>Tipo de Bloque</label>
-                <select
-                    name="tipo"
-                    className={styles.input}
-                    value={nuevoBoton.tipo}
-                    onChange={handleInputChange}
-                >
-                    <option value="normal">Botón Enlace</option>
-                    <option value="whatsapp">Botón WhatsApp</option>
-                    <option value="correo">Botón Correo</option>
-                    <option value="youtube">Video YouTube</option>
-                    <option value="texto">Bloque de Texto</option>
-                    <option value="seccion">Sección / Título</option>
-                    <option value="imagen">Imagen</option>
-                </select>
-            </div>
-
-            {["normal", "whatsapp", "correo", "texto", "seccion"].includes(nuevoBoton.tipo) && (
-                <div className="mb-2">
-                    <label className={styles.label}>Texto</label>
-                    {nuevoBoton.tipo === "texto" ? (
-                        <textarea
-                            name="texto"
-                            className={styles.input}
-                            value={nuevoBoton.texto}
-                            onChange={handleInputChange}
-                            rows="3"
-                        />
-                    ) : (
-                        <input
-                            name="texto"
-                            placeholder="Texto"
-                            className={styles.input}
-                            value={nuevoBoton.texto}
-                            onChange={handleInputChange}
-                        />
-                    )}
-                </div>
-            )}
-
-            {["normal", "whatsapp", "correo", "youtube"].includes(nuevoBoton.tipo) && (
-                <div className="mb-2">
-                    <label className={styles.label}>URL {nuevoBoton.tipo === "youtube" ? "del Video" : ""}</label>
-                    <input
-                        name="url"
-                        placeholder={
-                            nuevoBoton.tipo === "whatsapp" ? "https://wa.me/ + tu número (solo números)" :
-                            nuevoBoton.tipo === "correo" ? "mailto: + tu correo" :
-                            nuevoBoton.tipo === "youtube" ? "https://www.youtube.com/watch?v=..." :
-                            "URL completa (https://...)"
-                        }
-                        className={styles.input}
-                        value={nuevoBoton.url}
-                        onChange={handleInputChange}
-                    />
-                </div>
-            )}
-            
-            {nuevoBoton.tipo === "imagen" && (
-                <div className="mb-2">
-                    <label className={styles.label}>Subir Imagen</label>
-                    <SubirImagen
-                        urlInicial={nuevoBoton.url}
-                        carpeta="bloques_imagenes"
-                        onUploadSuccess={(url) => setNuevoBoton((p) => ({ ...p, url: url || "" }))}
-                    />
-                </div>
-            )}
-
-            {["normal", "whatsapp", "correo"].includes(nuevoBoton.tipo) && (
-                <div className="mb-3">
-                    <label className={styles.label}>Icono</label>
-                    <IconPicker
-                        value={nuevoBoton.icono}
-                        onChange={(val) => setNuevoBoton((p) => ({ ...p, icono: val }))}
-                    />
-                </div>
-            )}
-            
-            {nuevoBoton.tipo === "texto" && (
-                <div className="row g-2 mb-3">
-                    <div className="col">
-                        <label className={styles.label}>Alineación</label>
-                        <select
-                            name="alineacion"
-                            className={styles.input}
-                            value={nuevoBoton.alineacion || "center"}
-                            onChange={handleInputChange}
-                        >
-                            <option value="left">Izquierda</option>
-                            <option value="center">Centro</option>
-                            <option value="right">Derecha</option>
-                            <option value="justify">Justificado</option>
-                        </select>
-                    </div>
-                    <div className="col">
-                        <label className={styles.label}>Tamaño (ej: 16px)</label>
-                        <input
-                            name="tamano"
-                            className={styles.input}
-                            value={nuevoBoton.tamano || "16px"}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {["normal", "whatsapp", "correo", "texto", "seccion"].includes(nuevoBoton.tipo) && (
-                <div className="row g-2 mt-2">
-                    {["normal", "whatsapp", "correo"].includes(nuevoBoton.tipo) && (
-                        <div className="col">
-                            <label className={styles.label}>Color del fondo</label>
-                            <input
-                                type="color"
-                                name="bg_color"
-                                className={styles.color}
-                                value={nuevoBoton.bg_color}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                    )}
-                    {nuevoBoton.tipo === "seccion" && (
-                        <div className="col">
-                            <label className={styles.label}>Color de la línea</label>
-                            <input
-                                type="color"
-                                name="borde_color"
-                                className={styles.color}
-                                value={nuevoBoton.borde_color}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                    )}
-                    <div className="col">
-                        <label className={styles.label}>Color del texto</label>
-                        <input
-                            type="color"
-                            name="text_color"
-                            className={styles.color}
-                            value={nuevoBoton.text_color}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    {["normal", "whatsapp", "correo"].includes(nuevoBoton.tipo) && (
-                        <div className="col">
-                            <label className={styles.label}>Color del ícono</label>
-                            <input
-                                type="color"
-                                name="icon_color"
-                                className={styles.color}
-                                value={nuevoBoton.icon_color}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {["normal", "whatsapp", "correo", "youtube", "imagen"].includes(nuevoBoton.tipo) && (
-                <div className="row g-2 mt-2">
-                    <div className="col">
-                        <label className={styles.label}>Color del borde</label>
-                        <input
-                            type="color"
-                            name="borde_color"
-                            className={styles.color}
-                            value={nuevoBoton.borde_color}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    {nuevoBoton.tipo === "youtube" && (
-                        <div className="col">
-                            <label className={styles.label}>Ancho Video (%)</label>
-                            <input
-                                className={styles.input}
-                                type="number"
-                                name="ancho_video"
-                                min="10"
-                                max="100"
-                                value={nuevoBoton.ancho_video || "100"}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                    )}
-                    <div className="col">
-                        <label className={styles.label}>Grosor del borde (px)</label>
-                        <input
-                            className={styles.input}
-                            type="number"
-                            name="borde_grosor"
-                            min="0"
-                            max="30"
-                            value={nuevoBoton.borde_grosor}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                </div>
-            )}
-
-            <button className={`${styles.btn} ${styles.success} mt-2`} onClick={agregarBoton}>
-                <i className="bi bi-plus-circle" /> Agregar
-            </button>
         </div>
     );
 }
 
 export default EditorBotones;
-
