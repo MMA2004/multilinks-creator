@@ -3,10 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebase.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function ResFormulario() {
     const { url } = useParams();
     const navigate = useNavigate();
+    const { usuario } = useAuth();
 
     const [respuestas, setRespuestas] = useState([]);
     const [campos, setCampos] = useState([]);
@@ -19,7 +21,19 @@ export default function ResFormulario() {
             setLoading(true);
             setError("");
             try {
-                const q = query(collection(db, "respuestas_formulario"), where("multilink_url", "==", url));
+                const isAdmin = usuario?.email === "gibra.company@gmail.com";
+                let q;
+                
+                if (isAdmin) {
+                    q = query(collection(db, "respuestas_formulario"), where("multilink_url", "==", url));
+                } else {
+                    q = query(
+                        collection(db, "respuestas_formulario"), 
+                        where("multilink_url", "==", url),
+                        where("owner_uid", "==", usuario.uid)
+                    );
+                }
+
                 const snap = await getDocs(q);
                 const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 

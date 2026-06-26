@@ -10,7 +10,8 @@ function FormularioCliente() {
     const [campos, setCampos] = useState([]);
     const [formData, setFormData] = useState({});
     const [enviado, setEnviado] = useState(false);
-    const [multilinkUrl, setMultilinkUrl] = useState(""); // NUEVO
+    const [multilinkUrl, setMultilinkUrl] = useState("");
+    const [ownerUid, setOwnerUid] = useState("");
 
     useEffect(() => {
         const cargarFormulario = async () => {
@@ -19,7 +20,8 @@ function FormularioCliente() {
             if (snap.exists()) {
                 const data = snap.data();
                 setCampos(data.formulario_campos || []);
-                setMultilinkUrl(data.url); // <--- obtenemos la URL del multilink
+                setMultilinkUrl(data.url); 
+                setOwnerUid(data.uid);
             }
         };
         cargarFormulario();
@@ -44,6 +46,7 @@ function FormularioCliente() {
         try {
             await addDoc(collection(db, "respuestas_formulario"), {
                 multilink_url: multilinkUrl,
+                owner_uid: ownerUid,
                 respuestas: respuestasEtiquetadas,
                 timestamp: new Date().toISOString()
             });
