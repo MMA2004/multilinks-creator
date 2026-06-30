@@ -1,0 +1,299 @@
+.root {
+    min-height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+    background-color: #010101;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    color: #fff;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.btnBack {
+    background: rgba(58, 172, 214, 0.15);
+    border: 1px solid #3aacd6;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btnBack:hover {
+    background: #3aacd6;
+    color: #010101;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.searchInput {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 15px;
+    min-width: 250px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.searchInput:focus {
+    border-color: #3aacd6;
+    box-shadow: 0 0 0 4px rgba(58, 172, 214, 0.2);
+}
+
+.btnExport {
+    background: #010101;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btnExport:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+}
+
+.titleArea {
+    margin-bottom: 8px;
+}
+
+.title {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.pill {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(58, 172, 214, 0.15);
+    border: 1px solid #3aacd6;
+    font-size: 14px;
+    font-weight: 600;
+    color: #3aacd6;
+}
+
+/* KPI Cards */
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.kpiCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.kpiIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(58, 172, 214, 0.15);
+    color: #3aacd6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.kpiInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.kpiLabel {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpiValue {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 4px;
+}
+
+/* Data Table Container */
+.tableContainer {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.tableScroll {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.table th {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 16px 24px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table td {
+    padding: 20px 24px;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(58, 172, 214, 0.08);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.dateCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #3aacd6;
+    font-weight: 500;
+}
+
+.emptyState {
+    padding: 60px 24px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.emptyIcon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.footer {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 16px;
+}
+
+.footer a {
+    color: #3aacd6;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100vw;
+    background: #010101;
+    color: #3aacd6;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.error {
+    text-align: center;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .headerRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .searchInput {
+        width: 100%;
+    }
+    .btnExport {
+        width: 100%;
+        justify-content: center;
+    }
+    .kpiGrid {
+        grid-template-columns: 1fr;
+    }
+}

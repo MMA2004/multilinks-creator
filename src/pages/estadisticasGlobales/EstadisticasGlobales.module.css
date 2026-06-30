@@ -100,9 +100,24 @@ button { -webkit-appearance: none; appearance: none; background: none; color: in
     border-radius: 16px; padding: 16px;
     background: rgba(255,255,255,.08);
     border: 1px solid rgba(255,255,255,.20);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
 }
-.kpi h5 { margin: 0 0 6px; font-weight: 800; color: #ffffff; }
-.kpiVal { font-size: clamp(28px, 6vw, 40px); font-weight: 800; color: #3aacd6; }
+.kpiIcon {
+    font-size: 32px;
+    color: #3aacd6;
+    background: rgba(58,172,214,.15);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+.kpi h5 { margin: 0 0 6px; font-weight: 800; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
+.kpiVal { font-size: clamp(24px, 5vw, 32px); font-weight: 800; color: #ffffff; }
 
 /* ===== Mensajes ===== */
 .error {
@@ -111,6 +126,53 @@ button { -webkit-appearance: none; appearance: none; background: none; color: in
     border: 1px solid rgba(239,68,68,.55);
     color: #fee2e2; margin-bottom: 12px;
 }
+
+/* ===== Controles y Filtros ===== */
+.infoBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,.05);
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+.filterWrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,.9);
+}
+.textInput, .monthInput {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    font-family: inherit;
+    outline: none;
+}
+.monthInput::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* ===== Gráficos ===== */
+.chartsRow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+@media (min-width: 992px) {
+    .chartsRow {
+        flex-direction: row;
+    }
+}
+.chartWrap { flex: 2; height: 320px; }
+.chartWrapPie { flex: 1; height: 320px; }
 
 /* ===== Tabla ===== */
 .tableWrap {

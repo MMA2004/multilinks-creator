@@ -164,10 +164,7 @@ footer a {
     padding: 20px;
 }
 .plantilla_tarjeta .container { 
-    background: rgba(255, 255, 255, 0.95); 
-    backdrop-filter: blur(10px); 
     border-radius: 24px; 
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
     padding: 30px 20px; 
     margin-top: auto; 
     margin-bottom: auto; 
@@ -189,3 +186,28 @@ footer a {
 }
 .plantilla_tarjeta h2 { margin: 0 !important; font-size: 22px; text-align: left; }
 .plantilla_tarjeta h3 { margin: 5px 0 0 0 !important; font-size: 16px; text-align: left; }
+
+/* === Botón Imagen + Texto === */
+.boton-imagen-texto {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px; /* Redondeado tipo tarjeta */
+    margin: 20px auto;
+    width: 80%;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: white; /* Fallback */
+}
+.boton-imagen-texto-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.boton-imagen-texto-contenido {
+    padding: 15px 20px;
+    font-size: 20px;
+    text-align: center;
+    font-weight: 500;
+}

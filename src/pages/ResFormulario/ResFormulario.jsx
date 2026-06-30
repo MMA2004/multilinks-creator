@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebase.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import styles from "./ResFormulario.module.css";
 
 export default function ResFormulario() {
     const { url } = useParams();
@@ -37,6 +38,8 @@ export default function ResFormulario() {
                 const snap = await getDocs(q);
                 const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
+                // Sort by timestamp descending
+                data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 setRespuestas(data);
 
                 const todosLosCampos = new Set();
@@ -52,7 +55,7 @@ export default function ResFormulario() {
         };
 
         cargarRespuestas();
-    }, [url]);
+    }, [url, usuario]);
 
     const filtradas = useMemo(() => {
         const s = search.trim().toLowerCase();
@@ -90,69 +93,118 @@ export default function ResFormulario() {
         }
     };
 
+    if (loading) {
+        return <div className={styles.loading}>Cargando respuestas...</div>;
+    }
+
     return (
-        <div className="rfx-root">
-            <style>{styles}</style>
-            <div className="rfx-card">
-                <div className="rfx-top-bar">
-                    <button className="rfx-btn rfx-link" onClick={() => navigate(-1)}>
-                        <i className="bi bi-arrow-left" aria-hidden></i> Volver
+        <div className={styles.root}>
+            <div className={styles.container}>
+                <div className={styles.headerRow}>
+                    <button className={styles.btnBack} onClick={() => navigate("/mis-multilinks")}>
+                        <i className="bi bi-arrow-left"></i> Volver a Multilinks
                     </button>
-                    <div className="rfx-actions">
+                    <div className={styles.actions}>
                         <input
-                            className="rfx-input"
+                            className={styles.searchInput}
                             placeholder="Buscar en respuestas…"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
-                        <button className="rfx-btn" onClick={() => exportarDatos("csv")}>
-                            <i className="bi bi-filetype-csv" aria-hidden></i> CSV
+                        <button className={styles.btnExport} onClick={() => exportarDatos("csv")}>
+                            <i className="bi bi-filetype-csv"></i> CSV
                         </button>
-                        <button className="rfx-btn" onClick={() => exportarDatos("excel")}>
-                            <i className="bi bi-file-earmark-excel" aria-hidden></i> Excel
+                        <button className={styles.btnExport} onClick={() => exportarDatos("excel")}>
+                            <i className="bi bi-file-earmark-excel"></i> Excel
                         </button>
                     </div>
                 </div>
 
-                <div className="rfx-title-container">
-                    <h1 className="rfx-title">Respuestas del formulario</h1>
-                    <span className="rfx-pill">{url}.gibracompany.com</span>
+                <div className={styles.titleArea}>
+                    <h1 className={styles.title}>Respuestas de Leads</h1>
+                    <span className={styles.pill}>{url}.gibracompany.com</span>
                 </div>
 
-                {loading && <div className="rfx-loading">Cargando…</div>}
-                {error && <div className="rfx-error" role="alert">{error}</div>}
+                {error && <div className={styles.error}>{error}</div>}
 
-                {!loading && !error && (
+                {!error && (
                     <>
+                        <div className={styles.kpiGrid}>
+                            <div className={styles.kpiCard}>
+                                <div className={styles.kpiIcon}>
+                                    <i className="bi bi-people-fill"></i>
+                                </div>
+                                <div className={styles.kpiInfo}>
+                                    <span className={styles.kpiLabel}>Total Leads</span>
+                                    <span className={styles.kpiValue}>{respuestas.length}</span>
+                                </div>
+                            </div>
+                            <div className={styles.kpiCard}>
+                                <div className={styles.kpiIcon}>
+                                    <i className="bi bi-funnel-fill"></i>
+                                </div>
+                                <div className={styles.kpiInfo}>
+                                    <span className={styles.kpiLabel}>Resultados Búsqueda</span>
+                                    <span className={styles.kpiValue}>{filtradas.length}</span>
+                                </div>
+                            </div>
+                            <div className={styles.kpiCard}>
+                                <div className={styles.kpiIcon}>
+                                    <i className="bi bi-clock-history"></i>
+                                </div>
+                                <div className={styles.kpiInfo}>
+                                    <span className={styles.kpiLabel}>Último Lead</span>
+                                    <span className={styles.kpiValue} style={{ fontSize: '18px', marginTop: '10px' }}>
+                                        {respuestas.length > 0 
+                                            ? new Date(respuestas[0].timestamp).toLocaleDateString()
+                                            : "N/A"
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         {filtradas.length === 0 ? (
-                            <div className="rfx-empty">No hay respuestas{search ? " que coincidan con la búsqueda" : ""}.</div>
+                            <div className={styles.tableContainer}>
+                                <div className={styles.emptyState}>
+                                    <i className={`bi bi-inbox ${styles.emptyIcon}`}></i>
+                                    <div>No hay respuestas{search ? " que coincidan con la búsqueda." : " todavía."}</div>
+                                </div>
+                            </div>
                         ) : (
-                            <div className="rfx-tablewrap">
-                                <table className="rfx-table">
-                                    <thead>
-                                    <tr>
-                                        {campos.map((campo) => (
-                                            <th key={campo}>{campo}</th>
-                                        ))}
-                                        <th>Fecha de envío</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {filtradas.map((respuesta, i) => (
-                                        <tr key={i}>
-                                            {campos.map((campo) => (
-                                                <td key={campo}>{String(respuesta.respuestas?.[campo] ?? "")}</td>
+                            <div className={styles.tableContainer}>
+                                <div className={styles.tableScroll}>
+                                    <table className={styles.table}>
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha de envío</th>
+                                                {campos.map((campo) => (
+                                                    <th key={campo}>{campo}</th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filtradas.map((respuesta, i) => (
+                                                <tr key={i}>
+                                                    <td>
+                                                        <div className={styles.dateCell}>
+                                                            <i className="bi bi-calendar-event"></i>
+                                                            {new Date(respuesta.timestamp).toLocaleString()}
+                                                        </div>
+                                                    </td>
+                                                    {campos.map((campo) => (
+                                                        <td key={campo}>{String(respuesta.respuestas?.[campo] ?? "—")}</td>
+                                                    ))}
+                                                </tr>
                                             ))}
-                                            <td>{new Date(respuesta.timestamp).toLocaleString()}</td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
 
-                        <div className="rfx-footer">
-                            Powered by <a className="rfx-link-a" href="https://www.gibracompany.com/" target="_blank" rel="noreferrer">Gibra Company</a>
+                        <div className={styles.footer}>
+                            Powered by <a href="https://www.gibracompany.com/" target="_blank" rel="noreferrer">Gibra Company</a>
                         </div>
                     </>
                 )}
@@ -160,38 +212,3 @@ export default function ResFormulario() {
         </div>
     );
 }
-
-const styles = `
-  .rfx-root { min-height:100vh; width:100vw; padding:24px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; background-color: #010101; background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 20px 20px; font-family: 'Inter', system-ui, -apple-system, sans-serif; overflow-x: hidden; }
-  .rfx-card { width:100%; max-width:1200px; color:#ffffff; padding:24px; border-radius:20px; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.20); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
-  
-  .rfx-top-bar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; margin-bottom: 24px; }
-  .rfx-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  
-  .rfx-title-container { display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:32px; text-align:center; }
-  .rfx-title { font-size: clamp(24px, 4vw, 32px); font-weight: 800; color:#ffffff; letter-spacing:-0.5px; margin:0; }
-  .rfx-pill { display:inline-block; padding:8px 16px; border-radius:999px; background: rgba(58,172,214,.15); border:1px solid #3aacd6; font-size:14px; font-weight:600; color:#ffffff; max-width:100%; word-break:break-all; }
-
-  .rfx-input { flex:1; min-width: 200px; border-radius:12px; padding:10px 14px; font-size:15px; color:#010101; background: rgba(255,255,255,.98); border:1px solid rgba(15,23,42,.10); outline:none; transition: box-shadow .15s ease, border-color .15s ease, background .15s ease; }
-  .rfx-input:focus { border-color: #3aacd6; box-shadow: 0 0 0 4px rgba(58,172,214,.25); background: #ffffff; }
-  .rfx-btn { appearance:none; border:1px solid #3aacd6; border-radius:12px; padding:10px 14px; font-size:15px; font-weight:700; background: #010101; color:#ffffff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 10px 22px rgba(0,0,0,.35); transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease; }
-  .rfx-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,0,0,.45); background: #3aacd6; color: #010101; border-color: #3aacd6; }
-  .rfx-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
-  .rfx-btn.rfx-link { background: rgba(58,172,214,.15); border: 1px solid #3aacd6; color:#ffffff; }
-  .rfx-btn.rfx-link:hover { background: #3aacd6; color:#010101; }
-
-  .rfx-loading { text-align:center; padding:28px; color:#ffffff; }
-  .rfx-error { text-align:center; padding:16px; border-radius:12px; background: rgba(239,68,68,.2); border:1px solid rgba(239,68,68,.4); color:#fee2e2; margin-top: 10px; font-weight:500; }
-  .rfx-empty { text-align:center; padding:24px; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.20); border-radius:16px; color:#ffffff; }
-
-  .rfx-tablewrap { width:100%; overflow:auto; border-radius:16px; border:1px solid rgba(255,255,255,.20); background: rgba(255,255,255,.05); margin-top: 16px; }
-  .rfx-table { width:100%; border-collapse: collapse; }
-  .rfx-table th, .rfx-table td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,.1); color:#ffffff; font-size: 15px; }
-  .rfx-table thead th { position: sticky; top: 0; background: rgba(1,1,1,.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); text-align:left; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; color: rgba(255,255,255,0.85); border-bottom: 1px solid rgba(255,255,255,.20); }
-  .rfx-table tbody tr { transition: transform .15s ease, background .15s ease; }
-  .rfx-table tbody tr:hover { background: rgba(58,172,214,.15); }
-  .rfx-table tbody tr:last-child td { border-bottom: none; }
-  
-  .rfx-footer { margin-top: 22px; font-size:12px; color:#ffffff; opacity:.9; text-align:center; }
-  .rfx-link-a { color:#ffffff; text-decoration: underline; text-underline-offset: 3px; font-weight:600; }
-`;

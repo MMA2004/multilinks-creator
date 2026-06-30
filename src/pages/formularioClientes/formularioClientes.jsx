@@ -12,16 +12,37 @@ function FormularioCliente() {
     const [enviado, setEnviado] = useState(false);
     const [multilinkUrl, setMultilinkUrl] = useState("");
     const [miembros, setMiembros] = useState([]);
+    
+    const [config, setConfig] = useState({
+        titulo: "Contáctanos",
+        subtitulo: "Déjanos tu información y te responderemos a la brevedad.",
+        bgColor: "#010101",
+        textColor: "#ffffff",
+        btnColor: "#3aacd6",
+        mensajeAgradecimiento: "Gracias por tu mensaje. Nos pondremos en contacto contigo pronto."
+    });
 
     useEffect(() => {
         const cargarFormulario = async () => {
-            const docRef = doc(db, "multilinks", id);
-            const snap = await getDoc(docRef);
-            if (snap.exists()) {
-                const data = snap.data();
-                setCampos(data.formulario_campos || []);
-                setMultilinkUrl(data.url); 
-                setMiembros(data.miembros || []);
+            try {
+                const docRef = doc(db, "multilinks", id);
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    setCampos(data.formulario_campos || []);
+                    setMultilinkUrl(data.url); 
+                    setMiembros(data.miembros || []);
+                    setConfig({
+                        titulo: data.formulario_titulo || "Contáctanos",
+                        subtitulo: data.formulario_subtitulo || "Déjanos tu información y te responderemos a la brevedad.",
+                        bgColor: data.formulario_bg_color || "#010101",
+                        textColor: data.formulario_text_color || "#ffffff",
+                        btnColor: data.formulario_btn_color || "#3aacd6",
+                        mensajeAgradecimiento: data.formulario_mensaje_agradecimiento || "Gracias por tu mensaje. Nos pondremos en contacto contigo pronto."
+                    });
+                }
+            } catch (error) {
+                console.error("Error al cargar configuración", error);
             }
         };
         cargarFormulario();
@@ -40,7 +61,7 @@ function FormularioCliente() {
 
         const respuestasEtiquetadas = {};
         campos.forEach((campo) => {
-            respuestasEtiquetadas[campo.label] = formData[campo.nombre];
+            respuestasEtiquetadas[campo.label] = formData[campo.nombre] !== undefined ? formData[campo.nombre] : "";
         });
 
         try {
@@ -60,18 +81,18 @@ function FormularioCliente() {
 
     if (enviado) {
         return (
-            <div className={styles.root}>
-                <div className={styles.card}>
+            <div className={styles.root} style={{ backgroundColor: config.bgColor }}>
+                <div className={styles.card} style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.2)' }}>
                     <div className={styles.successCard}>
-                        <i className={`bi bi-check-circle-fill ${styles.successIcon}`}></i>
+                        <i className={`bi bi-check-circle-fill ${styles.successIcon}`} style={{ color: config.btnColor }}></i>
                         <div className={styles.successTitle}>¡Recibido!</div>
-                        <div className={styles.successText}>
-                            Gracias por tu mensaje. Nos pondremos en contacto contigo pronto.
+                        <div className={styles.successText} style={{ whiteSpace: 'pre-wrap' }}>
+                            {config.mensajeAgradecimiento}
                         </div>
                     </div>
-                    <div className={styles.footer}>
+                    <div className={styles.footer} style={{ color: config.textColor, opacity: 0.8 }}>
                         Powered by{" "}
-                        <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer">
+                        <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: config.textColor }}>
                             Gibra Company
                         </a>
                     </div>
@@ -81,16 +102,18 @@ function FormularioCliente() {
     }
 
     return (
-        <div className={styles.root}>
-            <div className={styles.card}>
-                <div className={styles.title}>Contáctanos</div>
-                <div className={styles.subtitle}>Déjanos tu información y te responderemos a la brevedad.</div>
+        <div className={styles.root} style={{ backgroundColor: config.bgColor }}>
+            <div className={styles.card} style={{ color: config.textColor }}>
+                <div className={styles.title}>{config.titulo}</div>
+                <div className={styles.subtitle} style={{ color: config.textColor, opacity: 0.8, whiteSpace: 'pre-wrap' }}>
+                    {config.subtitulo}
+                </div>
 
                 <form className={styles.form} onSubmit={handleSubmit}>
                     {campos.map((campo, i) => (
                         <div key={i} className={styles.field}>
                             {campo.tipo !== "checkbox" && (
-                                <label className={styles.label}>{campo.label}</label>
+                                <label className={styles.label} style={{ color: config.textColor }}>{campo.label}</label>
                             )}
 
                             {campo.tipo === "textarea" ? (
@@ -100,6 +123,7 @@ function FormularioCliente() {
                                     required={campo.requerido}
                                     onChange={handleChange}
                                     placeholder={`Escribe tu ${campo.label.toLowerCase()}...`}
+                                    style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.3)' }}
                                 />
                             ) : campo.tipo === "checkbox" ? (
                                 <label className={styles.checkboxWrap}>
@@ -110,8 +134,21 @@ function FormularioCliente() {
                                         onChange={handleChange}
                                         required={campo.requerido}
                                     />
-                                    <span className={styles.checkboxLabel}>{campo.label}</span>
+                                    <span className={styles.checkboxLabel} style={{ color: config.textColor }}>{campo.label}</span>
                                 </label>
+                            ) : campo.tipo === "select" ? (
+                                <select
+                                    className={styles.input}
+                                    name={campo.nombre}
+                                    onChange={handleChange}
+                                    required={campo.requerido}
+                                    style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.3)' }}
+                                >
+                                    <option value="" style={{ color: '#000' }}>Selecciona una opción</option>
+                                    {(campo.opciones || "").split(",").map(opt => opt.trim()).filter(Boolean).map((opcion, idx) => (
+                                        <option key={idx} value={opcion} style={{ color: '#000' }}>{opcion}</option>
+                                    ))}
+                                </select>
                             ) : (
                                 <input
                                     className={styles.input}
@@ -120,16 +157,23 @@ function FormularioCliente() {
                                     onChange={handleChange}
                                     required={campo.requerido}
                                     placeholder={`Tu ${campo.label.toLowerCase()}`}
+                                    style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.3)' }}
                                 />
                             )}
                         </div>
                     ))}
-                    <button className={styles.btn} type="submit">Enviar mensaje</button>
+                    <button 
+                        className={styles.btn} 
+                        type="submit"
+                        style={{ backgroundColor: config.btnColor, color: '#010101', borderColor: config.btnColor }}
+                    >
+                        Enviar mensaje
+                    </button>
                 </form>
 
-                <div className={styles.footer}>
+                <div className={styles.footer} style={{ color: config.textColor, opacity: 0.8 }}>
                     Powered by{" "}
-                    <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer">
+                    <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: config.textColor }}>
                         Gibra Company
                     </a>
                 </div>

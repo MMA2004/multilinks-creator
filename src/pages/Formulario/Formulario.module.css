@@ -187,35 +187,134 @@ input[type="submit"] { -webkit-appearance:none; appearance:none; background:none
     width: 100%;
     height: 750px;
     max-height: calc(100vh - 120px);
-    max-width: 375px;          /* Ancho estándar de iPhone */
+    max-width: 360px;
     margin-inline: auto;
-    border: 14px solid #111;
-    border-radius: 40px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.35), inset 0 0 0 4px #333;
-    background-color: #fff; /* Por defecto si no hay fondo */
-    overflow: hidden; /* Corta lo que se salga de los bordes curvos */
+    /* Borde exterior que simula el metal (Titanio) */
+    border: 4px solid #4a4a4c;
+    border-radius: 46px;
+    background-color: #000;
+    box-shadow: 
+        0 20px 50px rgba(0,0,0,.5),
+        inset 0 0 0 8px #000; /* Bisel negro interno */
+    z-index: 1;
 }
 
+/* Botones laterales simulados (Volumen, Silencio, Encendido) */
+.phone::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 120px;
+    width: 4px;
+    height: 30px;
+    background: #333;
+    border-radius: 4px 0 0 4px;
+    box-shadow: 0 50px 0 0 #333, 0 110px 0 0 #333; /* Switch y botones de volumen */
+}
+.phone::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 140px;
+    width: 4px;
+    height: 60px;
+    background: #333;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Isla Dinámica (Dynamic Island) */
 .notch {
     position: absolute;
-    top: 0;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
-    width: 130px;
-    height: 25px;
-    background-color: #111;
-    border-bottom-left-radius: 18px;
-    border-bottom-right-radius: 18px;
+    width: 110px;
+    height: 32px;
+    background-color: #000;
+    border-radius: 20px;
     z-index: 100;
+    box-shadow: inset 0 0 4px rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+}
+/* Lente de cámara dentro de la isla */
+.notch::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #111;
+    box-shadow: inset -2px -2px 4px rgba(255,255,255,0.2), inset 2px 2px 4px rgba(0,0,0,1);
+    margin-left: auto;
 }
 
 /* Pantalla interior donde renderiza VistaPrevia */
 .screen {
-    position: relative;
-    height: 100%;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    overflow: hidden;
+    border-radius: 36px;
+    background-color: #fff;
+    z-index: 2;
+}
+
+/* Barra de estado (Hora, Señal, Batería) */
+.statusBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 90;
+    pointer-events: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff; /* Asegúrate de que el fondo del multilink sea oscuro o usar mix-blend-mode */
+    mix-blend-mode: difference; /* Para que se vea en fondos blancos o negros */
+}
+.statusTime {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.5px;
+}
+.statusIcons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* Indicador de inicio (Home Bar) */
+.homeBar {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    background-color: rgba(255,255,255,0.8);
+    border-radius: 10px;
+    z-index: 90;
+    mix-blend-mode: difference;
+}
+
+/* Brillo de pantalla (Reflejo Glass) */
+.screenGlare {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    overflow: hidden; /* Scroll controlado por VistaPrevia interna */
-    border-radius: 26px; /* Para emparejar con el borde exterior */
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%);
+    pointer-events: none;
+    z-index: 99;
 }
 
 /* micro-reglas para contenido dentro de la pantalla */
@@ -377,5 +476,31 @@ input[type="submit"] { -webkit-appearance:none; appearance:none; background:none
 .accHeaderContent i {
     font-size: 20px;
     color: #3aacd6;
+}
+
+/* === TABS CUSTOM === */
+:global(.nav-tabs) {
+    border-bottom: 1px solid rgba(255,255,255,.2) !important;
+    margin-bottom: 20px;
+}
+:global(.nav-tabs .nav-link) {
+    color: #fff !important;
+    opacity: 0.6;
+    font-weight: 700;
+    font-size: 16px;
+    border: none !important;
+    background: transparent !important;
+    transition: all 0.3s ease;
+    padding: 12px 20px;
+}
+:global(.nav-tabs .nav-link:hover) {
+    opacity: 1;
+}
+:global(.nav-tabs .nav-link.active) {
+    color: #3aacd6 !important;
+    opacity: 1;
+    background: rgba(255,255,255,.05) !important;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 3px solid #3aacd6 !important;
 }
 

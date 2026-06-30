@@ -134,6 +134,44 @@ function VistaPrevia({ data }) {
                             );
                         }
 
+                        if (tipoActual === "boton_imagen_texto") {
+                            const glassStyles = boton.glassmorphism ? {
+                                backgroundColor: `color-mix(in srgb, ${boton.bg_color || 'white'} 25%, transparent)`,
+                                backdropFilter: 'blur(10px)',
+                                WebkitBackdropFilter: 'blur(10px)',
+                                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.4)'
+                            } : {
+                                backgroundColor: boton.bg_color || 'white',
+                                border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || '#000'}`
+                            };
+
+                            return (
+                                <div
+                                    key={index}
+                                    className="boton-imagen-texto"
+                                    onClick={() => window.open(boton.url || '#', '_blank')}
+                                    style={{
+                                        color: boton.text_color,
+                                        fontFamily: fuente_general,
+                                        marginBottom: '15px',
+                                        ...glassStyles
+                                    }}
+                                >
+                                    {boton.imagen_url && (
+                                        <img 
+                                            src={boton.imagen_url} 
+                                            alt={boton.texto || "Imagen"}
+                                            className="boton-imagen-texto-img"
+                                        />
+                                    )}
+                                    <div className="boton-imagen-texto-contenido">
+                                        {boton.texto || "Botón Img + Texto"}
+                                    </div>
+                                </div>
+                            );
+                        }
+
                         if (tipoActual === "youtube") {
                             let yt_url = boton.url || "";
                             if (yt_url.includes("watch?v=")) yt_url = yt_url.replace("watch?v=", "embed/");

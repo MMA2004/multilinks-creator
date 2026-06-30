@@ -14,6 +14,7 @@ import ResFormulario from "./pages/ResFormulario/ResFormulario.jsx";
 import AdminTools from "./pages/tools/tools.jsx";
 import EstadisticasGlobales from "./pages/estadisticasGlobales/estadisticasGlobales.jsx";
 import OlvideClave from "./pages/OlvideClave/OlvideClave.jsx";
+import ConfigurarLeads from "./pages/configurarLeads/ConfigurarLeads.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
 
@@ -30,6 +31,7 @@ function App() {
                 {/* Rutas Protegidas */}
                 <Route path="/panel" element={<ProtectedRoute><Panel /></ProtectedRoute>} />
                 <Route path="/editar/:id" element={<ProtectedRoute><Formulario /></ProtectedRoute>} />
+                <Route path="/configurar-leads/:id" element={<ProtectedRoute><ConfigurarLeads /></ProtectedRoute>} />
                 <Route path="/crear-multilink" element={<ProtectedRoute><CrearMultilink /></ProtectedRoute>} />
                 <Route path="/registrar-multilink" element={<ProtectedRoute><RegistrarMultilink /></ProtectedRoute>} />
                 <Route path="/mis-multilinks" element={<ProtectedRoute><MisMultilinks /></ProtectedRoute>} />

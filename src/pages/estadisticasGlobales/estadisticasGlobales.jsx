@@ -6,6 +6,19 @@ import { db } from "../../services/firebase";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useAdmin } from "../../hooks/useAdmin.js";
 import { useNavigate } from "react-router-dom";
+import {
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    CartesianGrid,
+    PieChart,
+    Pie,
+    Cell,
+    Legend
+} from "recharts";
 import styles from "./EstadisticasGlobales.module.css";
 
 export default function EstadisticasGlobales() {
@@ -78,6 +91,12 @@ export default function EstadisticasGlobales() {
                             clicksTotales: data?.clicks_totales ?? 0,
                             clicksPorBoton: data?.clicks_por_boton ?? {},
                             raw: data || null,
+                            topReferrer: (() => {
+                                const refs = data?.visitas_por_referrer || {};
+                                const entries = Object.entries(refs);
+                                if (entries.length === 0) return "N/A";
+                                return entries.sort((a, b) => b[1] - a[1])[0][0];
+                            })()
                         };
                     })
                 );
@@ -86,7 +105,7 @@ export default function EstadisticasGlobales() {
                     const subdominio = `${multilinks[i].url}.gibracompany.com`;
                     if (res.status === "fulfilled") return res.value;
                     console.warn(`Fallo stats para ${subdominio}:`, res.reason);
-                    return { url: subdominio, visitas: 0, clicksTotales: 0, clicksPorBoton: {}, raw: null };
+                    return { url: subdominio, visitas: 0, clicksTotales: 0, clicksPorBoton: {}, raw: null, topReferrer: "N/A" };
                 });
 
                 setRows(resultados);
@@ -116,6 +135,25 @@ export default function EstadisticasGlobales() {
         );
     }, [rows, selectedUrls]);
 
+    const globalCtr = useMemo(() => {
+        if (!totales.visitas) return 0;
+        const calc = (totales.clicks / totales.visitas) * 100;
+        return calc > 100 ? 100 : calc.toFixed(1);
+    }, [totales]);
+
+    const globalClicksData = useMemo(() => {
+        const aggs = {};
+        rows.filter((r) => selectedUrls.includes(r.url)).forEach(r => {
+            Object.entries(r.clicksPorBoton || {}).forEach(([btn, clk]) => {
+                aggs[btn] = (aggs[btn] || 0) + clk;
+            });
+        });
+        return Object.entries(aggs)
+            .map(([name, clicks]) => ({ name, clicks }))
+            .sort((a, b) => b.clicks - a.clicks);
+    }, [rows, selectedUrls]);
+
+    const COLORS = ['#3aabd4', '#0d6efd', '#20c997', '#ffc107', '#fd7e14', '#dc3545', '#6f42c1'];
     // 4) Exportación CSV/Excel (columnas dinámicas por botón)
     const exportar = (formato) => {
         const rowsToExport = rows.filter((r) => selectedUrls.includes(r.url));
@@ -204,17 +242,30 @@ export default function EstadisticasGlobales() {
 
                 <div className={styles.kpis}>
                     <div className={styles.kpi}>
-                        <h5>Visitas Totales</h5>
-                        <div className={styles.kpiVal}>{totales.visitas}</div>
+                        <div className={styles.kpiIcon}><i className="bi bi-eye"></i></div>
+                        <div>
+                            <h5>Visitas Totales</h5>
+                            <div className={styles.kpiVal}>{totales.visitas}</div>
+                        </div>
                     </div>
                     <div className={styles.kpi}>
-                        <h5>Clicks Totales</h5>
-                        <div className={styles.kpiVal}>{totales.clicks}</div>
+                        <div className={styles.kpiIcon}><i className="bi bi-hand-index-thumb"></i></div>
+                        <div>
+                            <h5>Clicks Totales</h5>
+                            <div className={styles.kpiVal}>{totales.clicks}</div>
+                        </div>
+                    </div>
+                    <div className={styles.kpi}>
+                        <div className={styles.kpiIcon}><i className="bi bi-lightning-charge"></i></div>
+                        <div>
+                            <h5>CTR Global</h5>
+                            <div className={styles.kpiVal}>{globalCtr}%</div>
+                        </div>
                     </div>
                 </div>
 
-                <div className={styles.controls} style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div className={styles.infoBar}>
+                    <div className={styles.filterWrap}>
                         <label htmlFor="searchUrlFilter" style={{ fontWeight: 600 }}>URL:</label>
                         <input
                             id="searchUrlFilter"
@@ -222,26 +273,82 @@ export default function EstadisticasGlobales() {
                             placeholder="Buscar URL..."
                             value={searchUrl}
                             onChange={(e) => setSearchUrl(e.target.value)}
-                            style={{ padding: "6px", borderRadius: "5px", border: "1px solid #ccc", minWidth: "150px" }}
+                            className={styles.textInput}
                         />
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <div className={styles.filterWrap}>
                         <label htmlFor="mesFilter" style={{ fontWeight: 600 }}>Mes:</label>
                         <input
                             id="mesFilter"
                             type="month"
                             value={mes}
                             onChange={(e) => setMes(e.target.value)}
-                            style={{ padding: "6px", borderRadius: "5px", border: "1px solid #ccc" }}
+                            className={styles.monthInput}
                         />
                     </div>
-                    <button className={styles.btn} onClick={() => exportar("csv")} type="button">
-                        Descargar CSV
-                    </button>
-                    <button className={styles.btn} onClick={() => exportar("excel")} type="button">
-                        Descargar Excel
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <button className={styles.btn} onClick={() => exportar("csv")} type="button">
+                            <i className="bi bi-filetype-csv"></i> CSV
+                        </button>
+                        <button className={styles.btn} onClick={() => exportar("excel")} type="button">
+                            <i className="bi bi-file-earmark-spreadsheet"></i> Excel
+                        </button>
+                    </div>
                 </div>
+
+                {!loading && globalClicksData.length > 0 && (
+                    <div className={styles.section}>
+                        <h5>Desempeño Global por Botón</h5>
+                        <div className={styles.chartsRow}>
+                            <div className={styles.chartWrap}>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={globalClicksData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eaeaea" />
+                                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#666' }} axisLine={false} tickLine={false} />
+                                        <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#666' }} axisLine={false} tickLine={false} />
+                                        <Tooltip cursor={{ fill: '#f8f9fa' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                        <Bar dataKey="clicks" fill="#3aabd4" radius={[4, 4, 0, 0]}>
+                                            {globalClicksData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className={styles.chartWrapPie}>
+                                <ResponsiveContainer width="100%" height={400}>
+                                    <PieChart>
+                                        <Pie
+                                            data={globalClicksData}
+                                            cx="50%"
+                                            cy="40%"
+                                            innerRadius={60}
+                                            outerRadius={90}
+                                            paddingAngle={5}
+                                            dataKey="clicks"
+                                        >
+                                            {globalClicksData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#000' }} />
+                                        <Legend 
+                                            verticalAlign="bottom" 
+                                            height={140}
+                                            iconType="circle"
+                                            wrapperStyle={{ 
+                                                maxHeight: '130px', 
+                                                overflowY: 'auto',
+                                                fontSize: '12px',
+                                                scrollbarWidth: 'thin'
+                                            }} 
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {loading ? (
                     <div className={styles.loading}>Cargando…</div>
@@ -265,6 +372,8 @@ export default function EstadisticasGlobales() {
                                     <th>URL</th>
                                     <th>Visitas</th>
                                     <th>Clicks totales</th>
+                                    <th>CTR</th>
+                                    <th>Top Referido</th>
                                     {allButtons.map((b) => (
                                         <th key={`h-${b}`}>Clicks {b}</th>
                                     ))}
@@ -285,6 +394,8 @@ export default function EstadisticasGlobales() {
                                         <td>{r.url}</td>
                                         <td>{r.visitas}</td>
                                         <td>{r.clicksTotales}</td>
+                                        <td>{r.visitas > 0 ? ((r.clicksTotales / r.visitas) * 100).toFixed(1) + '%' : '0%'}</td>
+                                        <td>{r.topReferrer}</td>
                                         {allButtons.map((b) => (
                                             <td key={`${r.url}-${b}`}>{r.clicksPorBoton?.[b] ?? 0}</td>
                                         ))}

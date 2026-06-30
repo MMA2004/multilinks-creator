@@ -8,6 +8,10 @@ import {
     YAxis,
     Tooltip,
     CartesianGrid,
+    PieChart,
+    Pie,
+    Cell,
+    Legend
 } from "recharts";
 import styles from "./Estadisticas.module.css";
 
@@ -17,6 +21,7 @@ export default function Estadisticas() {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [mesFiltro, setMesFiltro] = useState("");
 
     useEffect(() => {
         const controller = new AbortController();
@@ -25,7 +30,7 @@ export default function Estadisticas() {
             try {
                 setLoading(true);
                 setError(null);
-                const endpoint = `https://api.gibracompany.com/api/stats/${url}.gibracompany.com`;
+                const endpoint = `https://api.gibracompany.com/api/stats/${url}.gibracompany.com${mesFiltro ? `?mes=${mesFiltro}` : ''}`;
                 const res = await fetch(endpoint, { signal: controller.signal });
                 if (!res.ok) throw new Error("Error al obtener estadísticas");
                 const data = await res.json();
@@ -39,15 +44,29 @@ export default function Estadisticas() {
 
         fetchStats();
         return () => controller.abort();
-    }, [url]);
+    }, [url, mesFiltro]);
 
     const clicksData = useMemo(() => {
         if (!stats || !stats.clicks_por_boton) return [];
-        return Object.entries(stats.clicks_por_boton).map(([name, clicks]) => ({
-            name,
-            clicks,
-        }));
+        return Object.entries(stats.clicks_por_boton)
+            .map(([name, clicks]) => ({ name, clicks }))
+            .sort((a, b) => b.clicks - a.clicks);
     }, [stats]);
+
+    const referrersData = useMemo(() => {
+        if (!stats || !stats.visitas_por_referrer) return [];
+        return Object.entries(stats.visitas_por_referrer)
+            .map(([name, visits]) => ({ name, visits }))
+            .sort((a, b) => b.visits - a.visits);
+    }, [stats]);
+
+    const ctr = useMemo(() => {
+        if (!stats || !stats.visitas_totales) return 0;
+        const calc = (stats.clicks_totales / stats.visitas_totales) * 100;
+        return calc > 100 ? 100 : calc.toFixed(1);
+    }, [stats]);
+
+    const COLORS = ['#3aabd4', '#0d6efd', '#20c997', '#ffc107', '#fd7e14', '#dc3545', '#6f42c1'];
 
     return (
         <div className={styles.root}>
@@ -76,9 +95,20 @@ export default function Estadisticas() {
                     </a>
                 </div>
 
-                <div className={styles.info}>
-                    <i className="bi bi-info-circle" aria-hidden></i>
-                    <span>Mostrando datos de los últimos 90 días.</span>
+                <div className={styles.infoBar}>
+                    <div className={styles.info}>
+                        <i className="bi bi-info-circle" aria-hidden></i>
+                        <span>{mesFiltro ? `Mostrando datos de ${mesFiltro}` : "Mostrando datos históricos completos."}</span>
+                    </div>
+                    <div className={styles.filterWrap}>
+                        <label>Filtro por Mes:</label>
+                        <input 
+                            type="month" 
+                            className={styles.monthInput}
+                            value={mesFiltro}
+                            onChange={(e) => setMesFiltro(e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 {loading && <div className={styles.loading}>Cargando…</div>}
@@ -92,30 +122,101 @@ export default function Estadisticas() {
                     <>
                         <div className={styles.kpis}>
                             <div className={styles.kpi}>
-                                <h5>Visitas Totales</h5>
-                                <div className={styles.kpiVal}>{stats.visitas_totales ?? 0}</div>
+                                <div className={styles.kpiIcon}><i className="bi bi-eye"></i></div>
+                                <div>
+                                    <h5>Visitas Totales</h5>
+                                    <div className={styles.kpiVal}>{stats.visitas_totales ?? 0}</div>
+                                </div>
                             </div>
                             <div className={styles.kpi}>
-                                <h5>Clicks Totales</h5>
-                                <div className={styles.kpiVal}>{stats.clicks_totales ?? 0}</div>
+                                <div className={styles.kpiIcon}><i className="bi bi-hand-index-thumb"></i></div>
+                                <div>
+                                    <h5>Clicks Totales</h5>
+                                    <div className={styles.kpiVal}>{stats.clicks_totales ?? 0}</div>
+                                </div>
+                            </div>
+                            <div className={styles.kpi}>
+                                <div className={styles.kpiIcon}><i className="bi bi-lightning-charge"></i></div>
+                                <div>
+                                    <h5>CTR (Conversión)</h5>
+                                    <div className={styles.kpiVal}>{ctr}%</div>
+                                </div>
                             </div>
                         </div>
 
                         <div className={styles.section}>
-                            <h5>Clicks por botón</h5>
+                            <h5>Desempeño por Botón</h5>
                             {clicksData.length === 0 ? (
                                 <div className={styles.empty}>Aún no hay clicks registrados.</div>
                             ) : (
-                                <div className={styles.chartWrap}>
-                                    <ResponsiveContainer>
-                                        <BarChart data={clicksData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="name" />
-                                            <YAxis allowDecimals={false} />
-                                            <Tooltip />
-                                            <Bar dataKey="clicks" fill="#0d6efd" />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                <div className={styles.chartsRow}>
+                                    <div className={styles.chartWrap}>
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <BarChart data={clicksData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eaeaea" />
+                                                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#666' }} axisLine={false} tickLine={false} />
+                                                <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#666' }} axisLine={false} tickLine={false} />
+                                                <Tooltip cursor={{ fill: '#f8f9fa' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                                <Bar dataKey="clicks" fill="#3aabd4" radius={[4, 4, 0, 0]}>
+                                                    {clicksData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Bar>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className={styles.chartWrapPie}>
+                                        <ResponsiveContainer width="100%" height={400}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={clicksData}
+                                                    cx="50%"
+                                                    cy="40%"
+                                                    innerRadius={60}
+                                                    outerRadius={90}
+                                                    paddingAngle={5}
+                                                    dataKey="clicks"
+                                                >
+                                                    {clicksData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#000' }} />
+                                                <Legend 
+                                                    verticalAlign="bottom" 
+                                                    height={140}
+                                                    iconType="circle"
+                                                    wrapperStyle={{ 
+                                                        maxHeight: '130px', 
+                                                        overflowY: 'auto',
+                                                        fontSize: '12px',
+                                                        scrollbarWidth: 'thin'
+                                                    }} 
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.section}>
+                            <h5>Fuentes de Tráfico</h5>
+                            {referrersData.length === 0 ? (
+                                <div className={styles.empty}>Aún no hay datos de referidos.</div>
+                            ) : (
+                                <div className={styles.referrersList}>
+                                    {referrersData.map((ref, i) => (
+                                        <div key={i} className={styles.referrerItem}>
+                                            <div className={styles.referrerName}>
+                                                <i className={`bi ${ref.name === 'Directo' ? 'bi-link' : 'bi-box-arrow-in-right'}`}></i>
+                                                {ref.name}
+                                            </div>
+                                            <div className={styles.referrerCount}>
+                                                {ref.visits} visitas
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>

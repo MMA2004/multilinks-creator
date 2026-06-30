@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"; // ⬅️ usa navigate
 import { toast } from "react-hot-toast";
 import VistaPrevia from "../vistaPrevia/vistaPrevia.jsx";
-import { Accordion } from "react-bootstrap";
+import { Accordion, Tabs, Tab } from "react-bootstrap";
 import EditorBotones from "../../components/editorBotones/editorBotones.jsx";
 import SubirImagen from "../../components/subirImagenes/subirImagen.jsx";
 import { cargarMultilinkDesdeFirebase } from "../../services/cargarMultilinkDesdeFirebase.js";
@@ -13,6 +13,7 @@ import styles from "./Formulario.module.css";
 function Formulario() {
     const navigate = useNavigate();
     const { id } = useParams();
+    const [activeTab, setActiveTab] = useState("diseno");
 
     const FUENTES = [
         "Arial",
@@ -62,6 +63,7 @@ function Formulario() {
         fuente_general: "Arial",
         botones: [
             {
+                id: crypto.randomUUID(),
                 url: "",
                 texto: "",
                 icono: "",
@@ -94,7 +96,7 @@ function Formulario() {
                     return;
                 }
                 const yaTieneFormulario = data.botones?.some((b) => b.tipo === "ResFormulario");
-                const nuevosBotones = [...(data.botones || [])];
+                const nuevosBotones = (data.botones || []).map(b => ({ ...b, id: b.id || crypto.randomUUID() }));
 
                 if (data.formulario_activado && !yaTieneFormulario) {
                     nuevosBotones.push({
@@ -207,9 +209,11 @@ function Formulario() {
 
             <div className="container-fluid py-4">
                 <div className="row g-4">
-                    {/* Columna izquierda */}
-                    <div className="col-lg-4">
-                        <Accordion defaultActiveKey="0" className={styles.accForm}>
+                    {/* Área principal de Edición */}
+                    <div className="col-lg-8">
+                        <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4">
+                            <Tab eventKey="diseno" title="🎨 Diseño y Perfil" className="pt-2">
+                                <Accordion defaultActiveKey="0" className={styles.accForm}>
                             {/* Panel 1: Diseño y Fondo */}
                             <Accordion.Item eventKey="0" className={styles.accItem}>
                                 <Accordion.Header>
@@ -414,103 +418,39 @@ function Formulario() {
                                 </Accordion.Body>
                             </Accordion.Item>
                         </Accordion>
-                    </div>
+                            </Tab>
 
-                    {/* Columna centro-derecha */}
-                    <div className="col-lg-4">
-                        <div className={`${styles.card} shadow-sm`}>
-                            <div className="mt-2">
-                                <EditorBotones
-                                    botones={formData.botones}
-                                    setBotones={(nuevosBotones) => setFormData({ ...formData, botones: nuevosBotones })}
-                                />
-                            </div>
-                        </div>
-
-                        {formData.formulario_activado && (
-                            <div className={`${styles.card} shadow-sm`}>
-                                <h4 className={styles.h4}>Campos del Formulario</h4>
-
-                                {formData.formulario_campos?.map((campo, idx) => (
-                                    <div key={idx} className={styles.fieldrow}>
-                                        <input
-                                            className={styles.input}
-                                            placeholder="Etiqueta"
-                                            value={campo.label}
-                                            onChange={(e) => {
-                                                const nuevos = [...formData.formulario_campos];
-                                                nuevos[idx].label = e.target.value;
-                                                setFormData({ ...formData, formulario_campos: nuevos });
-                                            }}
+                            <Tab eventKey="bloques" title="🔗 Bloques del Multilink" className="pt-2">
+                                <div className={`${styles.card} shadow-sm`}>
+                                    <div className="mt-2">
+                                        <EditorBotones
+                                            botones={formData.botones}
+                                            setBotones={(nuevosBotones) => setFormData({ ...formData, botones: nuevosBotones })}
                                         />
-
-                                        <select
-                                            className={styles.input}
-                                            value={campo.tipo}
-                                            onChange={(e) => {
-                                                const nuevos = [...formData.formulario_campos];
-                                                nuevos[idx].tipo = e.target.value;
-                                                setFormData({ ...formData, formulario_campos: nuevos });
-                                            }}
-                                        >
-                                            <option value="text">Texto</option>
-                                            <option value="email">Email</option>
-                                            <option value="tel">Teléfono</option>
-                                            <option value="textarea">Área de texto</option>
-                                        </select>
-
-                                        <label className={styles.check}>
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                checked={campo.requerido}
-                                                onChange={(e) => {
-                                                    const nuevos = [...formData.formulario_campos];
-                                                    nuevos[idx].requerido = e.target.checked;
-                                                    setFormData({ ...formData, formulario_campos: nuevos });
-                                                }}
-                                            />
-                                            <span>Requerido</span>
-                                        </label>
-
-                                        <button
-                                            className={`${styles.btn} ${styles.danger} ${styles.del}`}
-                                            onClick={() => {
-                                                const nuevos = formData.formulario_campos.filter((_, i) => i !== idx);
-                                                setFormData({ ...formData, formulario_campos: nuevos });
-                                            }}
-                                            type="button"
-                                        >
-                                            Eliminar
-                                        </button>
                                     </div>
-                                ))}
+                                </div>
+                            </Tab>
 
-                                <button
-                                    className={`${styles.btn} ${styles.outline} mt-2`}
-                                    onClick={() => {
-                                        const nuevos = formData.formulario_campos ? [...formData.formulario_campos] : [];
-                                        nuevos.push({
-                                            nombre: `campo${nuevos.length + 1}`,
-                                            label: "",
-                                            tipo: "text",
-                                            requerido: false,
-                                        });
-                                        setFormData({ ...formData, formulario_campos: nuevos });
-                                    }}
-                                    type="button"
-                                >
-                                    Agregar campo
-                                </button>
-                            </div>
-                        )}
+                        </Tabs>
                     </div>
 
                     {/* Columna vista previa (sticky y centrada) */}
                     <div className="col-lg-4">
                         <div className={styles.previewWrap}>
                             <div className={styles.phone}>
+                                {/* Elementos de UI de un iPhone */}
+                                <div className={styles.statusBar}>
+                                    <span className={styles.statusTime}>9:41</span>
+                                    <div className={styles.statusIcons}>
+                                        <i className="bi bi-bar-chart-fill"></i>
+                                        <i className="bi bi-wifi"></i>
+                                        <i className="bi bi-battery-full"></i>
+                                    </div>
+                                </div>
                                 <div className={styles.notch} />
+                                <div className={styles.screenGlare} />
+                                <div className={styles.homeBar} />
+                                
                                 <div className={styles.screen}>
                                     <VistaPrevia data={formData} />
                                 </div>

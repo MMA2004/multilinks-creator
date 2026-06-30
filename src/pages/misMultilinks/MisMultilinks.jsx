@@ -219,14 +219,29 @@ export default function MisMultilinks() {
                         const susp = suspendedMap[slug];
                         const isWorking = !!itemLoading[slug];
                         return (
-                            <div className={styles.item} key={m.id}>
-                                <div className={styles.url}>{m.titulo_pagina || m.titulo || m.url}</div>
-                                <div className={styles.meta}>
-                                    <span className={styles.badge}>{m.url}.gibracompany.com</span>
+                            <div className={styles.item} key={m.id} style={susp ? { opacity: 0.8, borderColor: 'rgba(239, 68, 68, 0.4)' } : {}}>
+                                <div>
+                                    {susp && (
+                                        <div className={styles.suspendedBadge}>
+                                            <i className="bi bi-exclamation-triangle"></i> Suspendido
+                                        </div>
+                                    )}
+                                    <div className={styles.url}>{m.titulo_pagina || m.titulo || m.url}</div>
+                                    <div className={styles.meta}>
+                                        <span className={styles.badge}>{m.url}.gibracompany.com</span>
+                                    </div>
                                 </div>
                                 <div className={styles.actions}>
                                     <button className={styles.btn} onClick={() => navigate(`/editar/${m.id}`)} type="button">
                                         <i className="bi bi-pencil" aria-hidden></i> Editar
+                                    </button>
+                                    <button
+                                        className={`${styles.btn} ${styles.alt}`}
+                                        onClick={() => navigate(`/configurar-leads/${m.id}`)}
+                                        type="button"
+                                        title="Configurar campos del Formulario"
+                                    >
+                                        <i className="bi bi-funnel" aria-hidden></i> Leads
                                     </button>
                                     <button
                                         className={`${styles.btn} ${styles.alt}`}
@@ -243,10 +258,10 @@ export default function MisMultilinks() {
                                         <i className="bi bi-ui-checks-grid" aria-hidden></i> Respuestas
                                     </button>
                                     <a className={`${styles.btn} ${styles.linkBtn}`} href={publicUrl} target="_blank" rel="noopener noreferrer">
-                                        <i className="bi bi-box-arrow-up-right" aria-hidden></i> Ver página
+                                        <i className="bi bi-box-arrow-up-right" aria-hidden></i> Página
                                     </a>
                                     <button className={`${styles.btn} ${styles.linkBtn}`} onClick={() => copy(publicUrl)} type="button">
-                                        <i className="bi bi-clipboard" aria-hidden></i> Copiar link
+                                        <i className="bi bi-clipboard" aria-hidden></i> Copiar
                                     </button>
 
                                     {isAdmin && (
