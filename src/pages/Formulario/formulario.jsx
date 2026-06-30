@@ -54,6 +54,7 @@ function Formulario() {
         contacto_color: "",
         contacto_borde_color: "",
         contacto_borde_grosor: "",
+        contacto_glassmorphism: false,
         nombre: "",
         nota: "",
         fuente_titulo: "Arial",
@@ -219,9 +220,8 @@ function Formulario() {
                                         <label className={styles.label}>Diseño de Plantilla</label>
                                         <select className={styles.input} name="plantilla" value={formData.plantilla || "plantilla_comercial"} onChange={handleChange}>
                                             <option value="plantilla_comercial">Comercial (Clásica)</option>
-                                            <option value="plantilla_minimalista">Minimalista</option>
-                                            <option value="plantilla_oscura">Oscura Neón</option>
-                                            <option value="plantilla_glassmorphism">Glassmorphism (Cristal)</option>
+                                            <option value="plantilla_mosaico">Mosaico (Grid)</option>
+                                            <option value="plantilla_tarjeta">Tarjeta Profesional (Split)</option>
                                         </select>
                                     </div>
                                     <hr className={styles.hr} />
@@ -376,6 +376,14 @@ function Formulario() {
                                                 <div className="col-6">
                                                     <label className={styles.label}>Grosor</label>
                                                     <input type="number" min="0" max="15" className={styles.input} name="contacto_borde_grosor" value={formData.contacto_borde_grosor || 0} onChange={handleChange} />
+                                                </div>
+                                                <div className="col-12 mt-3">
+                                                    <div className="form-check form-switch">
+                                                        <input className="form-check-input" type="checkbox" name="contacto_glassmorphism" id="contacto_glassmorphism" checked={formData.contacto_glassmorphism || false} onChange={handleChange} style={{ cursor: "pointer" }} />
+                                                        <label className="form-check-label ms-2" htmlFor="contacto_glassmorphism" style={{ fontSize: '13px', fontWeight: 'bold', color: '#555', cursor: 'pointer' }}>
+                                                            Efecto Cristal
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <hr className={styles.hr} />

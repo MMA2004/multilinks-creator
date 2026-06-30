@@ -72,6 +72,7 @@ export default function CrearMultilink() {
                 mostrar_boton_contacto: true,
                 contacto_bg: "#000000",
                 contacto_color: "#ffffff",
+                contacto_glassmorphism: false,
                 nombre: "",
                 nota: "",
                 formulario_activado: formularioActivado,

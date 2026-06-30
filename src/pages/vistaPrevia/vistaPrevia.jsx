@@ -25,6 +25,7 @@ function VistaPrevia({ data }) {
         contacto_color = 'white',
         contacto_borde_grosor = '0',
         contacto_borde_color = '#000000',
+        contacto_glassmorphism = false,
         fuente_titulo = '',
         fuente_subtitulo = '',
         fuente_general = '',
@@ -67,29 +68,29 @@ function VistaPrevia({ data }) {
             style={backgroundStyle}
         >
             <div className="container">
-                {imagen && <img src={imagen} alt="Foto de perfil" className="profile-pic" style={{ width: tamano_foto, borderRadius: borde }} />}
-                <h2
-                    style={{
-                        color: color_titulo,
-                        fontSize: tamano_titulo,
-                        marginBottom: mb_titulo,
-                        marginTop: mt_titulo,
-                        fontFamily: fuente_titulo
-                    }}
-                >
-                    {titulo}
-                </h2>
-                <h3
-                    style={{
-                        color: color_subtitulo,
-                        fontSize: tamano_subtitulo,
-                        marginBottom: mb_subtitulo,
-                        marginTop: mt_subtitulo,
-                        fontFamily: fuente_subtitulo
-                    }}
-                >
-                    {subtitulo}
-                </h3>
+                {plantilla === 'plantilla_tarjeta' ? (
+                    <div className="profile-header">
+                        {imagen && <img src={imagen} alt="Foto de perfil" className="profile-pic" style={{ width: tamano_foto, borderRadius: borde }} />}
+                        <div className="profile-titles">
+                            <h2 style={{ color: color_titulo, fontSize: tamano_titulo, marginBottom: mb_titulo, marginTop: mt_titulo, fontFamily: fuente_titulo }}>
+                                {titulo}
+                            </h2>
+                            <h3 style={{ color: color_subtitulo, fontSize: tamano_subtitulo, marginBottom: mb_subtitulo, marginTop: mt_subtitulo, fontFamily: fuente_subtitulo }}>
+                                {subtitulo}
+                            </h3>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {imagen && <img src={imagen} alt="Foto de perfil" className="profile-pic" style={{ width: tamano_foto, borderRadius: borde }} />}
+                        <h2 style={{ color: color_titulo, fontSize: tamano_titulo, marginBottom: mb_titulo, marginTop: mt_titulo, fontFamily: fuente_titulo }}>
+                            {titulo}
+                        </h2>
+                        <h3 style={{ color: color_subtitulo, fontSize: tamano_subtitulo, marginBottom: mb_subtitulo, marginTop: mt_subtitulo, fontFamily: fuente_subtitulo }}>
+                            {subtitulo}
+                        </h3>
+                    </>
+                )}
 
                 <div className="social-buttons">
                     {botones.map((boton, index) => {
@@ -100,17 +101,28 @@ function VistaPrevia({ data }) {
 
                         if (esBotonClasico) {
                             const isCircular = boton.forma === "circular";
+                            
+                            const glassStyles = boton.glassmorphism ? {
+                                backgroundColor: `color-mix(in srgb, ${boton.bg_color || 'white'} 25%, transparent)`,
+                                backdropFilter: 'blur(10px)',
+                                WebkitBackdropFilter: 'blur(10px)',
+                                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.4)'
+                            } : {
+                                backgroundColor: boton.bg_color || 'white',
+                                border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || '#000'}`
+                            };
+
                             return (
                                 <div
                                     key={index}
                                     className={`boton ${isCircular ? 'boton-circular' : ''}`}
                                     onClick={() => window.open(boton.url, '_blank')}
                                     style={{
-                                        backgroundColor: boton.bg_color || 'white',
                                         color: boton.text_color,
-                                        border: `${boton.borde_grosor || 0}px solid ${boton.borde_color || '#000'}`,
                                         fontFamily: fuente_general,
-                                        marginBottom: '15px'
+                                        marginBottom: '15px',
+                                        ...glassStyles
                                     }}
                                 >
                                     <i
@@ -259,12 +271,15 @@ function VistaPrevia({ data }) {
                             <button
                                 className="guardar"
                                 style={{
-                                    backgroundColor: contacto_bg,
+                                    backgroundColor: contacto_glassmorphism ? `color-mix(in srgb, ${contacto_bg} 25%, transparent)` : contacto_bg,
+                                    backdropFilter: contacto_glassmorphism ? 'blur(10px)' : 'none',
+                                    WebkitBackdropFilter: contacto_glassmorphism ? 'blur(10px)' : 'none',
+                                    boxShadow: contacto_glassmorphism ? '0 8px 32px 0 rgba(0, 0, 0, 0.1)' : 'none',
                                     color: contacto_color,
-                                    border: `${contacto_borde_grosor}px solid ${contacto_borde_color}`,
+                                    border: contacto_glassmorphism ? '1px solid rgba(255, 255, 255, 0.4)' : `${contacto_borde_grosor}px solid ${contacto_borde_color}`,
                                     fontFamily: fuente_general,
                                     borderRadius: '30px',
-                                    padding: '10px 18px', // <- Bajamos de 25px a 18px para recortar los lados
+                                    padding: '10px 18px',
                                     fontSize: '16px',
                                     margin: '0 auto',
                                     cursor: 'pointer',

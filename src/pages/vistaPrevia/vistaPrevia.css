@@ -122,29 +122,70 @@ footer a {
     text-decoration: none;
 }
 
-/* === Plantilla Minimalista === */
-.plantilla_minimalista .container { padding: 40px 20px; }
-.plantilla_minimalista h2 { font-size: 28px; letter-spacing: -0.5px; }
-.plantilla_minimalista .profile-pic { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.plantilla_minimalista .boton { border-radius: 8px !important; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: all 0.3s ease; }
-.plantilla_minimalista .boton:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
-.plantilla_minimalista .guardar { box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s ease; }
-.plantilla_minimalista .guardar:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+/* === Plantilla Mosaico (Grid) === */
+.plantilla_mosaico .social-buttons { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
+}
+.plantilla_mosaico .social-buttons .boton { 
+    margin-bottom: 0 !important; 
+    width: 100% !important; 
+    aspect-ratio: 1 / 1;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+    padding: 10px;
+    border-radius: 15px !important;
+    font-size: 14px !important;
+    box-sizing: border-box;
+}
+.plantilla_mosaico .social-buttons .boton span {
+    word-break: break-word;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.plantilla_mosaico .social-buttons .boton i { 
+    margin-right: 0; 
+    margin-bottom: 8px; 
+    font-size: 34px !important; 
+    position: static;
+}
+.plantilla_mosaico .mapa-container, .plantilla_mosaico .video-container {
+    grid-column: 1 / -1; /* Ocupa ambas columnas */
+}
 
-/* === Plantilla Oscura === */
-.plantilla_oscura .container { padding: 40px 20px; }
-.plantilla_oscura h2 { font-size: 32px; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-.plantilla_oscura .profile-pic { box-shadow: 0 0 20px rgba(255,255,255,0.1); }
-.plantilla_oscura .boton { border-radius: 12px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease; overflow: hidden; }
-.plantilla_oscura .boton:hover { transform: scale(1.03); box-shadow: 0 0 15px currentColor; }
-.plantilla_oscura .guardar { box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease; }
-.plantilla_oscura .guardar:hover { transform: scale(1.05); box-shadow: 0 0 20px currentColor; }
-
-/* === Plantilla Glassmorphism === */
-.plantilla_glassmorphism .container { padding: 40px 20px; }
-.plantilla_glassmorphism h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.plantilla_glassmorphism .profile-pic { border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15); }
-.plantilla_glassmorphism .boton { border-radius: 20px !important; background: rgba(255, 255, 255, 0.15) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
-.plantilla_glassmorphism .boton:hover { transform: translateY(-3px); box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2); background: rgba(255, 255, 255, 0.25) !important; }
-.plantilla_glassmorphism .guardar { background: rgba(255, 255, 255, 0.2) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
-.plantilla_glassmorphism .guardar:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.3) !important; box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2); }
+/* === Plantilla Tarjeta Profesional (Split) === */
+.plantilla_tarjeta {
+    padding: 20px;
+}
+.plantilla_tarjeta .container { 
+    background: rgba(255, 255, 255, 0.95); 
+    backdrop-filter: blur(10px); 
+    border-radius: 24px; 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+    padding: 30px 20px; 
+    margin-top: auto; 
+    margin-bottom: auto; 
+}
+.plantilla_tarjeta .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+.plantilla_tarjeta .profile-pic {
+    margin: 0;
+    width: 90px !important;
+    height: 90px !important;
+}
+.plantilla_tarjeta .profile-titles {
+    flex: 1;
+}
+.plantilla_tarjeta h2 { margin: 0 !important; font-size: 22px; text-align: left; }
+.plantilla_tarjeta h3 { margin: 5px 0 0 0 !important; font-size: 16px; text-align: left; }

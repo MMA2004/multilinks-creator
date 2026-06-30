@@ -129,9 +129,18 @@ export default function IconPicker({ value = "", onChange }) {
                     </div>
 
                     <div className={styles.footer}>
-                        <button className={styles.cancel} onClick={() => setOpen(false)}>
-                            Cerrar
-                        </button>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                            <button className={styles.cancel} onClick={() => setOpen(false)}>
+                                Cerrar
+                            </button>
+                            <button 
+                                className={styles.cancel} 
+                                style={{ background: "#ff4d4f", color: "white", borderColor: "#ff4d4f" }} 
+                                onClick={() => { onChange?.(""); setOpen(false); }}
+                            >
+                                Quitar Ícono
+                            </button>
+                        </div>
                         {selected && (
                             <div className={styles.selectedInfo}>
                                 <i className={`bi ${selected.clase}`} />

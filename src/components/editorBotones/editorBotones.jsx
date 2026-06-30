@@ -273,6 +273,22 @@ function EditorBotones({ botones, setBotones }) {
                                                 <option value="circular">Circular (Solo ícono)</option>
                                             </select>
                                         </div>
+                                        <div className="col d-flex align-items-center">
+                                            <div className="form-check form-switch mt-4">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    role="switch"
+                                                    id={`glassmorphism-${i}`}
+                                                    checked={b.glassmorphism || false}
+                                                    onChange={(e) => handleBotonEdit(i, "glassmorphism", e.target.checked)}
+                                                    style={{ cursor: "pointer" }}
+                                                />
+                                                <label className="form-check-label ms-2" htmlFor={`glassmorphism-${i}`} style={{ fontSize: '13px', fontWeight: 'bold', color: '#555', cursor: 'pointer' }}>
+                                                    Efecto Cristal
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                                 
