@@ -110,6 +110,12 @@ function Formulario() {
                 }
 
                 const next = { ...data, botones: nuevosBotones };
+                
+                const plantillasValidas = ["plantilla_comercial", "plantilla_mosaico", "plantilla_tarjeta"];
+                if (!plantillasValidas.includes(next.plantilla)) {
+                    next.plantilla = "plantilla_comercial";
+                }
+
                 setFormData(next);
                 // establecemos el snapshot “guardado” al cargar
                 setLastSaved(JSON.stringify(next));
