@@ -5,6 +5,17 @@ import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import styles from "./formularioClientes.module.css";
 
+const getContrastColor = (hexColor) => {
+    if (!hexColor) return '#ffffff';
+    const hex = hexColor.replace('#', '');
+    if (hex.length !== 6 && hex.length !== 3) return '#ffffff';
+    const r = parseInt(hex.length === 3 ? hex[0]+hex[0] : hex.substring(0, 2), 16);
+    const g = parseInt(hex.length === 3 ? hex[1]+hex[1] : hex.substring(2, 4), 16);
+    const b = parseInt(hex.length === 3 ? hex[2]+hex[2] : hex.substring(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+};
+
 function FormularioCliente() {
     const { id } = useParams(); // este es el ID del multilink
     const [campos, setCampos] = useState([]);
@@ -80,9 +91,10 @@ function FormularioCliente() {
     };
 
     if (enviado) {
+        const autoTextColor = getContrastColor(config.bgColor);
         return (
             <div className={styles.root} style={{ backgroundColor: config.bgColor }}>
-                <div className={styles.card} style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.2)' }}>
+                <div className={styles.card} style={{ color: autoTextColor, borderColor: autoTextColor === '#000000' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)' }}>
                     <div className={styles.successCard}>
                         <i className={`bi bi-check-circle-fill ${styles.successIcon}`} style={{ color: config.btnColor }}></i>
                         <div className={styles.successTitle}>¡Recibido!</div>
@@ -92,7 +104,7 @@ function FormularioCliente() {
                     </div>
                     <div className={styles.footer} style={{ color: config.textColor, opacity: 0.8 }}>
                         Powered by{" "}
-                        <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: config.textColor }}>
+                        <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: autoTextColor }}>
                             Gibra Company
                         </a>
                     </div>
@@ -101,11 +113,15 @@ function FormularioCliente() {
         );
     }
 
+    const autoTextColor = getContrastColor(config.bgColor);
+    const autoBtnTextColor = getContrastColor(config.btnColor);
+    const autoBorderColor = autoTextColor === '#000000' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
+
     return (
         <div className={styles.root} style={{ backgroundColor: config.bgColor }}>
-            <div className={styles.card} style={{ color: config.textColor }}>
+            <div className={styles.card} style={{ color: autoTextColor }}>
                 <div className={styles.title}>{config.titulo}</div>
-                <div className={styles.subtitle} style={{ color: config.textColor, opacity: 0.8, whiteSpace: 'pre-wrap' }}>
+                <div className={styles.subtitle} style={{ color: autoTextColor, opacity: 0.8, whiteSpace: 'pre-wrap' }}>
                     {config.subtitulo}
                 </div>
 
@@ -113,7 +129,7 @@ function FormularioCliente() {
                     {campos.map((campo, i) => (
                         <div key={i} className={styles.field}>
                             {campo.tipo !== "checkbox" && (
-                                <label className={styles.label} style={{ color: config.textColor }}>{campo.label}</label>
+                                <label className={styles.label} style={{ color: autoTextColor }}>{campo.label}</label>
                             )}
 
                             {campo.tipo === "textarea" ? (
@@ -123,7 +139,7 @@ function FormularioCliente() {
                                     required={campo.requerido}
                                     onChange={handleChange}
                                     placeholder={`Escribe tu ${campo.label.toLowerCase()}...`}
-                                    style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.3)' }}
+                                    style={{ color: autoTextColor, borderColor: autoBorderColor }}
                                 />
                             ) : campo.tipo === "checkbox" ? (
                                 <label className={styles.checkboxWrap}>
@@ -134,7 +150,7 @@ function FormularioCliente() {
                                         onChange={handleChange}
                                         required={campo.requerido}
                                     />
-                                    <span className={styles.checkboxLabel} style={{ color: config.textColor }}>{campo.label}</span>
+                                    <span className={styles.checkboxLabel} style={{ color: autoTextColor }}>{campo.label}</span>
                                 </label>
                             ) : campo.tipo === "select" ? (
                                 <select
@@ -142,7 +158,7 @@ function FormularioCliente() {
                                     name={campo.nombre}
                                     onChange={handleChange}
                                     required={campo.requerido}
-                                    style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.3)' }}
+                                    style={{ color: autoTextColor, borderColor: autoBorderColor }}
                                 >
                                     <option value="" style={{ color: '#000' }}>Selecciona una opción</option>
                                     {(campo.opciones || "").split(",").map(opt => opt.trim()).filter(Boolean).map((opcion, idx) => (
@@ -157,7 +173,7 @@ function FormularioCliente() {
                                     onChange={handleChange}
                                     required={campo.requerido}
                                     placeholder={`Tu ${campo.label.toLowerCase()}`}
-                                    style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.3)' }}
+                                    style={{ color: autoTextColor, borderColor: autoBorderColor }}
                                 />
                             )}
                         </div>
@@ -165,15 +181,15 @@ function FormularioCliente() {
                     <button 
                         className={styles.btn} 
                         type="submit"
-                        style={{ backgroundColor: config.btnColor, color: '#010101', borderColor: config.btnColor }}
+                        style={{ backgroundColor: config.btnColor, color: autoBtnTextColor, borderColor: config.btnColor }}
                     >
                         Enviar mensaje
                     </button>
                 </form>
 
-                <div className={styles.footer} style={{ color: config.textColor, opacity: 0.8 }}>
+                <div className={styles.footer} style={{ color: autoTextColor, opacity: 0.8 }}>
                     Powered by{" "}
-                    <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: config.textColor }}>
+                    <a className={styles.anchor} href="https://www.gibracompany.com/" target="_blank" rel="noreferrer" style={{ color: autoTextColor }}>
                         Gibra Company
                     </a>
                 </div>

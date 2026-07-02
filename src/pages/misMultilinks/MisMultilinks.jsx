@@ -9,6 +9,7 @@ import { eliminarCarpetaMultilink } from "../../services/eliminarMultilink.js";
 import { extraerPathDesdeURL } from "../../utils/storagePaths.js";
 import { getSuspensionStatus, setSuspension } from "../../services/suspension.js";
 import { toast } from "react-hot-toast";
+import QRModal from "../../components/qrModal/QRModal.jsx";
 import styles from "./MisMultilinks.module.css";
 
 export default function MisMultilinks() {
@@ -19,6 +20,10 @@ export default function MisMultilinks() {
     const [deletingId, setDeletingId] = useState(null);
     const [suspendedMap, setSuspendedMap] = useState({}); // { slug: boolean }
     const [itemLoading, setItemLoading] = useState({});
+    
+    // QR Modal State
+    const [showQR, setShowQR] = useState(false);
+    const [selectedQR, setSelectedQR] = useState({ url: "", titulo: "" });
 
     const { usuario } = useAuth();
     const isAdmin = useAdmin();
@@ -263,6 +268,17 @@ export default function MisMultilinks() {
                                     <button className={`${styles.btn} ${styles.linkBtn}`} onClick={() => copy(publicUrl)} type="button">
                                         <i className="bi bi-clipboard" aria-hidden></i> Copiar
                                     </button>
+                                    <button 
+                                        className={`${styles.btn} ${styles.linkBtn}`} 
+                                        onClick={() => {
+                                            setSelectedQR({ url: publicUrl, titulo: m.titulo_pagina || m.titulo || m.url });
+                                            setShowQR(true);
+                                        }} 
+                                        type="button"
+                                        title="Generar Código QR"
+                                    >
+                                        <i className="bi bi-qr-code" aria-hidden></i> QR
+                                    </button>
 
                                     {isAdmin && (
                                         <>
@@ -307,6 +323,13 @@ export default function MisMultilinks() {
                     </a>
                 </div>
             </div>
+
+            <QRModal 
+                show={showQR} 
+                onHide={() => setShowQR(false)} 
+                url={selectedQR.url} 
+                titulo={selectedQR.titulo} 
+            />
         </div>
     );
 }

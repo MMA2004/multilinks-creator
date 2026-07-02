@@ -119,7 +119,6 @@ function SubirImagen({ urlInicial = "", carpeta = "imagenes", onUploadSuccess })
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
                     onDrop={handleDrop}
-                    onClick={() => inputRef.current?.click()}
                 >
                     <input
                         ref={inputRef}

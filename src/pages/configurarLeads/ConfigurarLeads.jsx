@@ -5,6 +5,17 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import styles from "./ConfigurarLeads.module.css";
 
+const getContrastColor = (hexColor) => {
+    if (!hexColor) return '#ffffff';
+    const hex = hexColor.replace('#', '');
+    if (hex.length !== 6 && hex.length !== 3) return '#ffffff';
+    const r = parseInt(hex.length === 3 ? hex[0]+hex[0] : hex.substring(0, 2), 16);
+    const g = parseInt(hex.length === 3 ? hex[1]+hex[1] : hex.substring(2, 4), 16);
+    const b = parseInt(hex.length === 3 ? hex[2]+hex[2] : hex.substring(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+};
+
 export default function ConfigurarLeads() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -112,6 +123,11 @@ export default function ConfigurarLeads() {
     };
 
     if (loading) return <div className={styles.loading}>Cargando...</div>;
+
+    const autoTextColor = getContrastColor(formData.formulario_bg_color);
+    const autoBtnTextColor = getContrastColor(formData.formulario_btn_color);
+    const autoBorderColor = autoTextColor === '#000000' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
+    const autoBorderColorLight = autoTextColor === '#000000' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)';
 
     return (
         <div className={styles.root}>
@@ -274,16 +290,6 @@ export default function ConfigurarLeads() {
                                         />
                                     </div>
                                     <div className={styles.fieldGroup}>
-                                        <label>Color del Texto</label>
-                                        <input
-                                            type="color"
-                                            name="formulario_text_color"
-                                            value={formData.formulario_text_color}
-                                            onChange={handleChange}
-                                            className={styles.colorInput}
-                                        />
-                                    </div>
-                                    <div className={styles.fieldGroup}>
                                         <label>Color del Botón</label>
                                         <input
                                             type="color"
@@ -322,8 +328,8 @@ export default function ConfigurarLeads() {
                         
                         <div className={styles.screen}>
                             {formData.formulario_activado ? (
-                                <div className={styles.previewFormRoot} style={{ backgroundColor: formData.formulario_bg_color, color: formData.formulario_text_color }}>
-                                    <div className={styles.previewFormCard} style={{ borderColor: 'rgba(255,255,255,0.2)' }}>
+                                <div className={styles.previewFormRoot} style={{ backgroundColor: formData.formulario_bg_color, color: autoTextColor }}>
+                                    <div className={styles.previewFormCard} style={{ borderColor: autoBorderColorLight }}>
                                         <div className={styles.previewFormTitle}>{formData.formulario_titulo || "Contáctanos"}</div>
                                         <div className={styles.previewFormSubtitle} style={{ opacity: 0.8, whiteSpace: 'pre-wrap' }}>
                                             {formData.formulario_subtitulo}
@@ -338,17 +344,17 @@ export default function ConfigurarLeads() {
                                                         <label className={styles.previewFormLabel}>{c.label}</label>
                                                     )}
                                                     {c.tipo === 'textarea' ? (
-                                                        <textarea className={styles.previewFormInput} rows="2" placeholder="..." style={{ color: formData.formulario_text_color, borderColor: 'rgba(255,255,255,0.3)' }} disabled></textarea>
+                                                        <textarea className={styles.previewFormInput} rows="2" placeholder="..." style={{ color: autoTextColor, borderColor: autoBorderColor }} disabled></textarea>
                                                     ) : c.tipo === 'checkbox' ? (
                                                         <label style={{ display: 'flex', gap: '8px', fontSize: '14px', alignItems: 'center' }}>
                                                             <input type="checkbox" disabled /> {c.label}
                                                         </label>
                                                     ) : c.tipo === 'select' ? (
-                                                        <select className={styles.previewFormInput} style={{ color: formData.formulario_text_color, borderColor: 'rgba(255,255,255,0.3)' }} disabled>
+                                                        <select className={styles.previewFormInput} style={{ color: autoTextColor, borderColor: autoBorderColor }} disabled>
                                                             <option>Selecciona una opción</option>
                                                         </select>
                                                     ) : (
-                                                        <input className={styles.previewFormInput} placeholder="..." style={{ color: formData.formulario_text_color, borderColor: 'rgba(255,255,255,0.3)' }} disabled />
+                                                        <input className={styles.previewFormInput} placeholder="..." style={{ color: autoTextColor, borderColor: autoBorderColor }} disabled />
                                                     )}
                                                 </div>
                                             ))
@@ -356,7 +362,7 @@ export default function ConfigurarLeads() {
                                         
                                         <button 
                                             className={styles.previewFormBtn}
-                                            style={{ backgroundColor: formData.formulario_btn_color, color: '#010101' }}
+                                            style={{ backgroundColor: formData.formulario_btn_color, color: autoBtnTextColor }}
                                             disabled
                                         >
                                             Enviar mensaje
