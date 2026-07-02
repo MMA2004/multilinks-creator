@@ -54,22 +54,22 @@ export default function MisMultilinks() {
 
     // Cargar estado de suspensión para cada slug (solo si admin)
     useEffect(() => {
-        if (!isAdmin) return;
-        const fetchStatuses = async () => {
-            const map = {};
-            for (const m of multilinks) {
+        if (!isAdmin || !multilinks.length) return;
+        
+        const fetchStatuses = () => {
+            multilinks.forEach(async (m) => {
                 const slug = String(m.url || "").trim().toLowerCase();
-                if (!slug) continue;
+                if (!slug) return;
                 try {
                     const res = await getSuspensionStatus(slug);
-                    map[slug] = !!res?.suspended;
+                    setSuspendedMap(prev => ({ ...prev, [slug]: !!res?.suspended }));
                 } catch (e) {
                     console.warn("No se pudo obtener estado de", slug, e);
                 }
-            }
-            setSuspendedMap(map);
+            });
         };
-        if (multilinks.length) fetchStatuses();
+        
+        fetchStatuses();
     }, [isAdmin, multilinks]);
 
     const filtrados = useMemo(() => {
@@ -256,11 +256,26 @@ export default function MisMultilinks() {
                                         <i className="bi bi-graph-up" aria-hidden></i> Estadísticas
                                     </button>
                                     <button
+                                        className={`${styles.btn} ${styles.alt}`}
+                                        onClick={() => navigate(`/configurar-valoraciones/${m.id}`)}
+                                        type="button"
+                                        title="Configurar Sistema de Valoraciones"
+                                    >
+                                        <i className="bi bi-star" aria-hidden></i> Valoraciones
+                                    </button>
+                                    <button
                                         className={`${styles.btn} ${styles.linkBtn}`}
                                         onClick={() => navigate(`/respuestas/${m.url}`)}
                                         type="button"
                                     >
-                                        <i className="bi bi-ui-checks-grid" aria-hidden></i> Respuestas
+                                        <i className="bi bi-ui-checks-grid" aria-hidden></i> Res. Leads
+                                    </button>
+                                    <button
+                                        className={`${styles.btn} ${styles.linkBtn}`}
+                                        onClick={() => navigate(`/respuestas-valoraciones/${m.url}`)}
+                                        type="button"
+                                    >
+                                        <i className="bi bi-star-fill" aria-hidden></i> Res. Val.
                                     </button>
                                     <a className={`${styles.btn} ${styles.linkBtn}`} href={publicUrl} target="_blank" rel="noopener noreferrer">
                                         <i className="bi bi-box-arrow-up-right" aria-hidden></i> Página

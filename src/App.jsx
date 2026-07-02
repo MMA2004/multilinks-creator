@@ -15,6 +15,9 @@ import AdminTools from "./pages/tools/tools.jsx";
 import EstadisticasGlobales from "./pages/estadisticasGlobales/estadisticasGlobales.jsx";
 import OlvideClave from "./pages/OlvideClave/OlvideClave.jsx";
 import ConfigurarLeads from "./pages/configurarLeads/ConfigurarLeads.jsx";
+import ConfigurarValoraciones from "./pages/configurarValoraciones/ConfigurarValoraciones.jsx";
+import ValoracionCliente from "./pages/valoracionCliente/ValoracionCliente.jsx";
+import ResValoraciones from "./pages/ResValoraciones/ResValoraciones.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
 
@@ -32,6 +35,7 @@ function App() {
                 <Route path="/panel" element={<ProtectedRoute><Panel /></ProtectedRoute>} />
                 <Route path="/editar/:id" element={<ProtectedRoute><Formulario /></ProtectedRoute>} />
                 <Route path="/configurar-leads/:id" element={<ProtectedRoute><ConfigurarLeads /></ProtectedRoute>} />
+                <Route path="/configurar-valoraciones/:id" element={<ProtectedRoute><ConfigurarValoraciones /></ProtectedRoute>} />
                 <Route path="/crear-multilink" element={<ProtectedRoute><CrearMultilink /></ProtectedRoute>} />
                 <Route path="/registrar-multilink" element={<ProtectedRoute><RegistrarMultilink /></ProtectedRoute>} />
                 <Route path="/mis-multilinks" element={<ProtectedRoute><MisMultilinks /></ProtectedRoute>} />
@@ -42,7 +46,9 @@ function App() {
                 {/* Rutas Públicas (acceso por clave o enlace) */}
                 <Route path="/acceder" element={<AccederMultilink />} />
                 <Route path="/formulario/:id" element={<FormularioCliente />} />
+                <Route path="/valoracion/:id" element={<ValoracionCliente />} />
                 <Route path="/respuestas/:url" element={<ProtectedRoute><ResFormulario /></ProtectedRoute>} />
+                <Route path="/respuestas-valoraciones/:url" element={<ProtectedRoute><ResValoraciones /></ProtectedRoute>} />
             </Routes>
         </Router>
     );

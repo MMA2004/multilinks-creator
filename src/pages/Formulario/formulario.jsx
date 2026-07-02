@@ -96,6 +96,7 @@ function Formulario() {
                     return;
                 }
                 const yaTieneFormulario = data.botones?.some((b) => b.tipo === "ResFormulario");
+                const yaTieneValoracion = data.botones?.some((b) => b.tipo === "ResValoracion");
                 const nuevosBotones = (data.botones || []).map(b => ({ ...b, id: b.id || crypto.randomUUID() }));
 
                 if (data.formulario_activado && !yaTieneFormulario) {
@@ -108,6 +109,19 @@ function Formulario() {
                         icon_color: "#ffffff",
                         fijo: true,
                         tipo: "ResFormulario",
+                    });
+                }
+                
+                if (data.valoracion_activada && !yaTieneValoracion) {
+                    nuevosBotones.push({
+                        url: `https://multilinks-creator.gibracompany.com/valoracion/${id}`,
+                        texto: "Calificar Experiencia",
+                        icono: "bi-star-fill",
+                        bg_color: "#ffc107",
+                        text_color: "#000000",
+                        icon_color: "#000000",
+                        fijo: true,
+                        tipo: "ResValoracion",
                     });
                 }
 
