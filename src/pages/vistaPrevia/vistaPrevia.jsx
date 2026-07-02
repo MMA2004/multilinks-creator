@@ -97,7 +97,7 @@ function VistaPrevia({ data }) {
                         const tipoActual = boton.tipo || "enlace";
 
                         // Mapear tipos antiguos a "enlace"
-                        const esBotonClasico = ["enlace", "normal", "whatsapp", "correo", "ResFormulario", ""].includes(tipoActual);
+                        const esBotonClasico = ["enlace", "normal", "whatsapp", "correo", "ResFormulario", "ResValoracion", ""].includes(tipoActual);
 
                         if (esBotonClasico) {
                             const isCircular = boton.forma === "circular";

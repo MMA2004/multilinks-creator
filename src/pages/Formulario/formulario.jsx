@@ -101,6 +101,7 @@ function Formulario() {
 
                 if (data.formulario_activado && !yaTieneFormulario) {
                     nuevosBotones.push({
+                        id: crypto.randomUUID(),
                         url: `https://multilinks-creator.gibracompany.com/formulario/${id}`,
                         texto: "Formulario",
                         icono: "bi-ui-checks",
@@ -114,6 +115,7 @@ function Formulario() {
                 
                 if (data.valoracion_activada && !yaTieneValoracion) {
                     nuevosBotones.push({
+                        id: crypto.randomUUID(),
                         url: `https://multilinks-creator.gibracompany.com/valoracion/${id}`,
                         texto: "Calificar Experiencia",
                         icono: "bi-star-fill",

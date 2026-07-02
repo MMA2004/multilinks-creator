@@ -57,7 +57,7 @@ function EditorBotones({ botones, setBotones }) {
 
     const agregarBotonRapido = (tipo) => {
         const nuevos = [...botones];
-        const indexResFormulario = nuevos.findIndex((b) => b.tipo === "ResFormulario");
+        const indexResFormulario = nuevos.findIndex((b) => b.tipo === "ResFormulario" || b.tipo === "ResValoracion");
         
         let textoPredefinido = "Nuevo Botón";
         let iconoPredefinido = "bi-link-45deg";

@@ -60,7 +60,7 @@ export function SortableBotonItem({
                             className={styles.input}
                             value={tipoActual}
                             onChange={(e) => handleBotonEdit(index, "tipo", e.target.value)}
-                            disabled={b.tipo === "ResFormulario"}
+                            disabled={b.tipo === "ResFormulario" || b.tipo === "ResValoracion"}
                         >
                             <option value="normal">Botón Enlace</option>
                             <option value="whatsapp">Botón WhatsApp</option>
@@ -74,10 +74,13 @@ export function SortableBotonItem({
                             {b.tipo === "ResFormulario" && (
                                 <option value="ResFormulario">ResFormulario</option>
                             )}
+                            {b.tipo === "ResValoracion" && (
+                                <option value="ResValoracion">ResValoracion</option>
+                            )}
                         </select>
                     </div>
 
-                    {["normal", "whatsapp", "correo", "ResFormulario", "texto", "seccion", "boton_imagen_texto"].includes(tipoActual) && (
+                    {["normal", "whatsapp", "correo", "ResFormulario", "ResValoracion", "texto", "seccion", "boton_imagen_texto"].includes(tipoActual) && (
                         <div className={tipoActual === "texto" ? "col-12" : "col-md-6"}>
                             <label className={styles.label}>Texto</label>
                             {tipoActual === "texto" ? (
@@ -97,7 +100,7 @@ export function SortableBotonItem({
                         </div>
                     )}
 
-                    {["normal", "whatsapp", "correo", "youtube", "mapa", "ResFormulario", "boton_imagen_texto"].includes(tipoActual) && (
+                    {["normal", "whatsapp", "correo", "youtube", "mapa", "ResFormulario", "ResValoracion", "boton_imagen_texto"].includes(tipoActual) && (
                         <div className="col-md-6">
                             <label className={styles.label}>URL {tipoActual === "youtube" ? "del Video" : tipoActual === "mapa" ? "del Mapa Embed" : ""}</label>
                             <input
@@ -108,7 +111,7 @@ export function SortableBotonItem({
                                     placeholderPorTipo(tipoActual)
                                 }
                                 onChange={(e) => handleBotonEdit(index, "url", e.target.value)}
-                                readOnly={b.tipo === "ResFormulario"}
+                                readOnly={b.tipo === "ResFormulario" || b.tipo === "ResValoracion"}
                             />
                         </div>
                     )}
@@ -124,7 +127,7 @@ export function SortableBotonItem({
                         </div>
                     )}
 
-                    {["normal", "whatsapp", "correo", "ResFormulario"].includes(tipoActual) && (
+                    {["normal", "whatsapp", "correo", "ResFormulario", "ResValoracion"].includes(tipoActual) && (
                         <div className="col-md-6">
                             <label className={styles.label}>Icono</label>
                             <IconPicker
@@ -139,7 +142,7 @@ export function SortableBotonItem({
                     <div className={styles.sectionTitle}>Diseño y Estilo</div>
                 )}
                 
-                {["normal", "whatsapp", "correo", "ResFormulario", "boton_imagen_texto"].includes(tipoActual) && (
+                {["normal", "whatsapp", "correo", "ResFormulario", "ResValoracion", "boton_imagen_texto"].includes(tipoActual) && (
                     <div className="row g-2 mb-3">
                         <div className="col">
                             <label className={styles.label}>Forma del Botón</label>
@@ -197,9 +200,9 @@ export function SortableBotonItem({
                     </div>
                 )}
 
-                {["normal", "whatsapp", "correo", "ResFormulario", "texto", "seccion", "boton_imagen_texto"].includes(tipoActual) && (
+                {["normal", "whatsapp", "correo", "ResFormulario", "ResValoracion", "texto", "seccion", "boton_imagen_texto"].includes(tipoActual) && (
                     <div className="row g-2">
-                        {["normal", "whatsapp", "correo", "ResFormulario", "boton_imagen_texto"].includes(tipoActual) && (
+                        {["normal", "whatsapp", "correo", "ResFormulario", "ResValoracion", "boton_imagen_texto"].includes(tipoActual) && (
                             <div className="col">
                                 <label className={styles.label}>Color del fondo</label>
                                 <input
@@ -230,7 +233,7 @@ export function SortableBotonItem({
                                 onChange={(e) => handleBotonEdit(index, "text_color", e.target.value)}
                             />
                         </div>
-                        {["normal", "whatsapp", "correo", "ResFormulario"].includes(tipoActual) && (
+                        {["normal", "whatsapp", "correo", "ResFormulario", "ResValoracion"].includes(tipoActual) && (
                             <div className="col">
                                 <label className={styles.label}>Color del ícono</label>
                                 <input
@@ -244,7 +247,7 @@ export function SortableBotonItem({
                     </div>
                 )}
 
-                {["normal", "whatsapp", "correo", "youtube", "imagen", "mapa", "ResFormulario", "boton_imagen_texto"].includes(tipoActual) && (
+                {["normal", "whatsapp", "correo", "youtube", "imagen", "mapa", "ResFormulario", "ResValoracion", "boton_imagen_texto"].includes(tipoActual) && (
                     <div className="row g-2 mt-2">
                         <div className="col">
                             <label className={styles.label}>Color del borde</label>
