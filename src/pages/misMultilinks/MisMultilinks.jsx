@@ -16,7 +16,11 @@ export default function MisMultilinks() {
     const [multilinks, setMultilinks] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(() => sessionStorage.getItem("misMultilinksSearch") || "");
+
+    useEffect(() => {
+        sessionStorage.setItem("misMultilinksSearch", search);
+    }, [search]);
     const [deletingId, setDeletingId] = useState(null);
     const [suspendedMap, setSuspendedMap] = useState({}); // { slug: boolean }
     const [itemLoading, setItemLoading] = useState({});
